@@ -40,7 +40,7 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "What the Dhruv!?",
   description:
     "A personal daily log of the best thing seen each day, built in Next.js with componentized animations.",

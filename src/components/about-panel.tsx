@@ -34,10 +34,15 @@ export function AboutPanel({ isVisible }: AboutPanelProps) {
         {aboutParagraphs.map((paragraph, index) => (
           <p
             key={paragraph}
-            className={`font-sans text-[16px] leading-[1.6] text-foreground transition-all duration-600 ease-out transform ${
-              isMounted ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            className={`font-sans text-[16px] leading-[1.6] text-foreground transition-transform transition-opacity duration-600 ease-out transform ${
+              isMounted
+                ? "translate-y-0 opacity-100"
+                : "translate-y-4 opacity-0"
             }`}
-            style={{ transitionDelay: `${50 + 80 * index}ms`, letterSpacing: "0.01em" }}
+            style={{
+              transitionDelay: `${50 + 80 * index}ms`,
+              letterSpacing: "0.01em",
+            }}
           >
             {paragraph}
           </p>

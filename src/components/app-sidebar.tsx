@@ -5,7 +5,13 @@ import { useWebHaptics } from "web-haptics/react";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +27,13 @@ import { SiteLogo } from "@/components/site-logo";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { LanguageToggle } from "@/components/ui/page-language";
 import type { DayData, Entry, MonthData } from "@/lib/types";
-import { CANONICAL_GENRES, getTopicColor, getTopicKeyFromEntry, getTopicKeysFromEntry, TOPICS } from "@/lib/topics";
+import {
+  CANONICAL_GENRES,
+  getTopicColor,
+  getTopicKeyFromEntry,
+  getTopicKeysFromEntry,
+  TOPICS,
+} from "@/lib/topics";
 import { cn } from "@/lib/utils";
 import { socialLinks } from "@/../content/sidebar/profile";
 
@@ -53,10 +65,12 @@ interface AppSidebarProps {
   selectedDate: string | null;
   onDayClick: (day: DayData) => void;
   onAboutClick: () => void;
-  onSubscribeClick: () => void;
   activeView: "day" | "about";
   totalEntries?: number;
-  recentEntries?: Pick<Entry, "date" | "title" | "primary_color" | "icon_name" | "genre">[];
+  recentEntries?: Pick<
+    Entry,
+    "date" | "title" | "primary_color" | "icon_name" | "genre"
+  >[];
 }
 
 export function AppSidebar({
@@ -64,7 +78,6 @@ export function AppSidebar({
   selectedDate,
   onDayClick,
   onAboutClick,
-  onSubscribeClick,
   activeView = "day",
   totalEntries = 0,
   recentEntries = [],
@@ -72,7 +85,6 @@ export function AppSidebar({
   const { isMobile, setOpenMobile, state, openMobile } = useSidebar();
   const { trigger } = useWebHaptics();
   const [optimisticDate, setOptimisticDate] = useState<string | null>(null);
-  const [aboutAtBottom, setAboutAtBottom] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [topicMenuOpen, setTopicMenuOpen] = useState(false);
   const [filterMenuPos, setFilterMenuPos] = useState({ left: 0, top: 0 });
@@ -91,25 +103,44 @@ export function AppSidebar({
   });
   const [slideDir, setSlideDir] = useState<1 | -1>(1);
   const monthIndexRef = useRef(monthIndex);
-  monthIndexRef.current = monthIndex;
   const { ripples: aboutRipples, addRipple: addAboutRipple } = useGlassRipple();
-  const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    setIsDark(root.classList.contains("dark"));
-    const observer = new MutationObserver(() => setIsDark(root.classList.contains("dark")));
-    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+  useLayoutEffect(() => {
+    monthIndexRef.current = monthIndex;
+  }, [monthIndex]);
 
   const isOpen = isMobile ? openMobile : state === "expanded";
   const [penflowAnimate, setPenflowAnimate] = useState(false);
+  const [penflowPlayheadKey, setPenflowPlayheadKey] = useState(0);
+  /** Canvas stroke must be literal hex — 2D canvas does not reliably resolve `var()` / CSS colors. Dark = white ink. */
+  const [penflowColor, setPenflowColor] = useState("#1a1a18");
+
+  useLayoutEffect(() => {
+    const syncPenflowColor = () => {
+      setPenflowColor(
+        document.documentElement.classList.contains("dark")
+          ? "#ffffff"
+          : "#1a1a18",
+      );
+    };
+    syncPenflowColor();
+    const observer = new MutationObserver(syncPenflowColor);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
-    if (!isOpen) return;
-    if (sessionStorage.getItem("btw_penflow_played")) return;
-    sessionStorage.setItem("btw_penflow_played", "1");
-    setPenflowAnimate(true);
+    queueMicrotask(() => {
+      if (!isOpen) {
+        setPenflowAnimate(false);
+        return;
+      }
+      setPenflowPlayheadKey((k) => k + 1);
+      setPenflowAnimate(true);
+    });
   }, [isOpen]);
 
   useLayoutEffect(() => {
@@ -118,7 +149,7 @@ export function AppSidebar({
   }, [isMobile, state]);
 
   useEffect(() => {
-    setOptimisticDate(null);
+    queueMicrotask(() => setOptimisticDate(null));
   }, [selectedDate]);
 
   useEffect(() => {
@@ -128,7 +159,7 @@ export function AppSidebar({
   }, [activeView]);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => setMounted(true));
   }, []);
 
   useEffect(() => {
@@ -174,17 +205,21 @@ export function AppSidebar({
     const targetIdx = monthsData.findIndex((month) =>
       month.days.some((day) => day.date === selectedDate),
     );
-    if (targetIdx === -1 || targetIdx === monthIndexRef.current) return;
-    setSlideDir(targetIdx < monthIndexRef.current ? 1 : -1);
-    setMonthIndex(targetIdx);
+    const prevIdx = monthIndexRef.current;
+    if (targetIdx === -1 || targetIdx === prevIdx) return;
+    queueMicrotask(() => {
+      setSlideDir(targetIdx < prevIdx ? 1 : -1);
+      setMonthIndex(targetIdx);
+    });
   }, [selectedDate, monthsData]);
 
   const activeDate = optimisticDate || selectedDate;
 
   // When exactly one topic is selected, propagate its color to calendar highlights
-  const activeFilterColor = selectedTopics.length === 1
-    ? (getTopicColor(selectedTopics[0]) ?? null)
-    : null;
+  const activeFilterColor =
+    selectedTopics.length === 1
+      ? (getTopicColor(selectedTopics[0]) ?? null)
+      : null;
 
   const availableTopics = useMemo(() => {
     const counts = new Map<string, number>();
@@ -204,7 +239,10 @@ export function AppSidebar({
   }, [recentEntries]);
 
   const filteredRecentEntries = useMemo(
-    () => recentEntries.filter((entry) => matchesTopicFilter(entry.genre, entry.icon_name, selectedTopics)),
+    () =>
+      recentEntries.filter((entry) =>
+        matchesTopicFilter(entry.genre, entry.icon_name, selectedTopics),
+      ),
     [recentEntries, selectedTopics],
   );
 
@@ -217,7 +255,11 @@ export function AppSidebar({
           if (selectedTopics.length === 0) return day;
           return {
             ...day,
-            hasContent: matchesTopicFilter(day.genre, day.iconName, selectedTopics),
+            hasContent: matchesTopicFilter(
+              day.genre,
+              day.iconName,
+              selectedTopics,
+            ),
           };
         }),
       })),
@@ -230,7 +272,8 @@ export function AppSidebar({
   const todayMonthIdx = filteredMonthsData.findIndex((month) =>
     month.days.some((day) => day.isToday),
   );
-  const entriesThisMonth = currentMonth?.days.filter((day) => day.hasContent).length ?? 0;
+  const entriesThisMonth =
+    currentMonth?.days.filter((day) => day.hasContent).length ?? 0;
   const selectedTopicCount = selectedTopics.length;
 
   const toggleTopic = (topicId: string) => {
@@ -274,21 +317,27 @@ export function AppSidebar({
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <SiteLogo size="md" className="pointer-events-none -ml-1 opacity-92" />
+              <SiteLogo
+                size="md"
+                className="pointer-events-none -ml-1 opacity-92"
+              />
             </div>
 
             {(isMobile || state === "expanded") && (
               <div className="flex items-center gap-2 pt-0.5">
                 <LanguageToggle compact={isMobile} />
                 <SidebarTrigger
-                  className="glass-btn size-8 rounded-lg text-foreground/55 hover:text-foreground transition-all duration-200"
+                  className="glass-btn size-8 rounded-lg"
                   aria-label="Close sidebar"
                 />
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
+          <div
+            className="flex items-center gap-1.5"
+            onClick={(event) => event.stopPropagation()}
+          >
             {activeView === "day" ? (
               <>
                 <button
@@ -313,9 +362,13 @@ export function AppSidebar({
                         ? "text-foreground"
                         : "text-foreground/50 hover:text-foreground",
                     )}
-                    style={activeFilterColor ? {
-                      boxShadow: `0 0 0 1px ${activeFilterColor}38, 0 0 8px ${activeFilterColor}18`,
-                    } : undefined}
+                    style={
+                      activeFilterColor
+                        ? {
+                            boxShadow: `0 0 0 1px ${activeFilterColor}38, 0 0 8px ${activeFilterColor}18`,
+                          }
+                        : undefined
+                    }
                     aria-haspopup="dialog"
                     aria-expanded={topicMenuOpen}
                     aria-label="Choose topics"
@@ -357,7 +410,10 @@ export function AppSidebar({
                         initial={{ opacity: 0, y: -6, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                        transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{
+                          duration: 0.16,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
                       >
                         <div className="filter-dropdown">
                           <div className="filter-dropdown-toolbar">
@@ -378,38 +434,75 @@ export function AppSidebar({
                               setSelectedTopics([]);
                               setTopicMenuOpen(false);
                             }}
-                            className={cn("filter-dropdown-row", selectedTopics.length === 0 && "is-selected")}
+                            className={cn(
+                              "filter-dropdown-row",
+                              selectedTopics.length === 0 && "is-selected",
+                            )}
                           >
                             <div className="filter-dropdown-row-main">
-                              <span className="filter-dropdown-all-icon"><Filter size={10} aria-hidden="true" /></span>
-                              <span className="filter-dropdown-label">All Topics</span>
+                              <span className="filter-dropdown-all-icon">
+                                <Filter size={10} aria-hidden="true" />
+                              </span>
+                              <span className="filter-dropdown-label">
+                                All Topics
+                              </span>
                             </div>
-                            <span className={cn("filter-dropdown-check", selectedTopics.length === 0 ? "opacity-100" : "opacity-0")}>
+                            <span
+                              className={cn(
+                                "filter-dropdown-check",
+                                selectedTopics.length === 0
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            >
                               <Check size={11} aria-hidden="true" />
                             </span>
                           </button>
                           <div className="filter-dropdown-list">
                             {availableTopics.map((topic) => {
-                              const selected = selectedTopics.includes(topic.id);
+                              const selected = selectedTopics.includes(
+                                topic.id,
+                              );
                               return (
                                 <button
                                   key={topic.id}
                                   onClick={() => toggleTopic(topic.id)}
-                                  className={cn("filter-dropdown-row", selected && "is-selected")}
-                                  style={selected ? {
-                                    background: `${topic.color}18`,
-                                    borderColor: `${topic.color}40`,
-                                  } : undefined}
+                                  className={cn(
+                                    "filter-dropdown-row",
+                                    selected && "is-selected",
+                                  )}
+                                  style={
+                                    selected
+                                      ? {
+                                          background: `${topic.color}18`,
+                                          borderColor: `${topic.color}40`,
+                                        }
+                                      : undefined
+                                  }
                                 >
                                   <div className="filter-dropdown-row-main">
                                     <span className="filter-dropdown-topic-icon">
-                                      <Icon name={topic.id} size="sm" color={topic.color} className="shrink-0" />
+                                      <Icon
+                                        name={topic.id}
+                                        size="sm"
+                                        color={topic.color}
+                                        className="shrink-0"
+                                      />
                                     </span>
-                                    <span className="filter-dropdown-label truncate">{topic.label}</span>
+                                    <span className="filter-dropdown-label truncate">
+                                      {topic.label}
+                                    </span>
                                   </div>
                                   <div className="filter-dropdown-trailing">
-                                    <span className="filter-dropdown-count">{topic.count}</span>
-                                    <span className={cn("filter-dropdown-check", selected ? "opacity-100" : "opacity-0")}>
+                                    <span className="filter-dropdown-count">
+                                      {topic.count}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "filter-dropdown-check",
+                                        selected ? "opacity-100" : "opacity-0",
+                                      )}
+                                    >
                                       <Check size={11} aria-hidden="true" />
                                     </span>
                                   </div>
@@ -423,84 +516,131 @@ export function AppSidebar({
                   </AnimatePresence>
                 </div>
 
-                {!isMobile && mounted && createPortal(
-                  <AnimatePresence>
-                    {topicMenuOpen && (
-                      <div
-                        ref={filterMenuRef}
-                        className="glass-dock dropdown-panel fixed z-[85] w-[156px] rounded-[16px] p-1.5"
-                        style={{ left: filterMenuPos.left, top: filterMenuPos.top }}
-                      >
-                        <motion.div
-                          initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                          transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                          className="filter-dropdown"
+                {!isMobile &&
+                  mounted &&
+                  createPortal(
+                    <AnimatePresence>
+                      {topicMenuOpen && (
+                        <div
+                          ref={filterMenuRef}
+                          className="glass-dock dropdown-panel fixed z-[85] w-[156px] rounded-[16px] p-1.5"
+                          style={{
+                            left: filterMenuPos.left,
+                            top: filterMenuPos.top,
+                          }}
                         >
-                          <div className="filter-dropdown-toolbar">
-                            {selectedTopics.length > 0 && (
-                              <button
-                                onClick={() => {
-                                  setSelectedTopics([]);
-                                  setTopicMenuOpen(false);
-                                }}
-                                className="filter-dropdown-clear"
-                              >
-                                Clear
-                              </button>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => {
-                              setSelectedTopics([]);
-                              setTopicMenuOpen(false);
+                          <motion.div
+                            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                            transition={{
+                              duration: 0.16,
+                              ease: [0.22, 1, 0.36, 1],
                             }}
-                            className={cn("filter-dropdown-row", selectedTopics.length === 0 && "is-selected")}
+                            className="filter-dropdown"
                           >
-                            <div className="filter-dropdown-row-main">
-                              <span className="filter-dropdown-all-icon"><Filter size={10} aria-hidden="true" /></span>
-                              <span className="filter-dropdown-label">All Topics</span>
-                            </div>
-                            <span className={cn("filter-dropdown-check", selectedTopics.length === 0 ? "opacity-100" : "opacity-0")}>
-                              <Check size={11} aria-hidden="true" />
-                            </span>
-                          </button>
-                          <div className="filter-dropdown-list">
-                            {availableTopics.map((topic) => {
-                              const selected = selectedTopics.includes(topic.id);
-                              return (
+                            <div className="filter-dropdown-toolbar">
+                              {selectedTopics.length > 0 && (
                                 <button
-                                  key={topic.id}
-                                  onClick={() => toggleTopic(topic.id)}
-                                  className={cn("filter-dropdown-row", selected && "is-selected")}
-                                  style={selected ? {
-                                    background: `${topic.color}18`,
-                                    borderColor: `${topic.color}40`,
-                                  } : undefined}
+                                  onClick={() => {
+                                    setSelectedTopics([]);
+                                    setTopicMenuOpen(false);
+                                  }}
+                                  className="filter-dropdown-clear"
                                 >
-                                  <div className="filter-dropdown-row-main">
-                                    <span className="filter-dropdown-topic-icon">
-                                      <Icon name={topic.id} size="sm" color={topic.color} className="shrink-0" />
-                                    </span>
-                                    <span className="filter-dropdown-label truncate">{topic.label}</span>
-                                  </div>
-                                  <div className="filter-dropdown-trailing">
-                                    <span className="filter-dropdown-count">{topic.count}</span>
-                                    <span className={cn("filter-dropdown-check", selected ? "opacity-100" : "opacity-0")}>
-                                      <Check size={11} aria-hidden="true" />
-                                    </span>
-                                  </div>
+                                  Clear
                                 </button>
-                              );
-                            })}
-                          </div>
-                        </motion.div>
-                      </div>
-                    )}
-                  </AnimatePresence>,
-                  document.body,
-                )}
+                              )}
+                            </div>
+                            <button
+                              onClick={() => {
+                                setSelectedTopics([]);
+                                setTopicMenuOpen(false);
+                              }}
+                              className={cn(
+                                "filter-dropdown-row",
+                                selectedTopics.length === 0 && "is-selected",
+                              )}
+                            >
+                              <div className="filter-dropdown-row-main">
+                                <span className="filter-dropdown-all-icon">
+                                  <Filter size={10} aria-hidden="true" />
+                                </span>
+                                <span className="filter-dropdown-label">
+                                  All Topics
+                                </span>
+                              </div>
+                              <span
+                                className={cn(
+                                  "filter-dropdown-check",
+                                  selectedTopics.length === 0
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              >
+                                <Check size={11} aria-hidden="true" />
+                              </span>
+                            </button>
+                            <div className="filter-dropdown-list">
+                              {availableTopics.map((topic) => {
+                                const selected = selectedTopics.includes(
+                                  topic.id,
+                                );
+                                return (
+                                  <button
+                                    key={topic.id}
+                                    onClick={() => toggleTopic(topic.id)}
+                                    className={cn(
+                                      "filter-dropdown-row",
+                                      selected && "is-selected",
+                                    )}
+                                    style={
+                                      selected
+                                        ? {
+                                            background: `${topic.color}18`,
+                                            borderColor: `${topic.color}40`,
+                                          }
+                                        : undefined
+                                    }
+                                  >
+                                    <div className="filter-dropdown-row-main">
+                                      <span className="filter-dropdown-topic-icon">
+                                        <Icon
+                                          name={topic.id}
+                                          size="sm"
+                                          color={topic.color}
+                                          className="shrink-0"
+                                        />
+                                      </span>
+                                      <span className="filter-dropdown-label truncate">
+                                        {topic.label}
+                                      </span>
+                                    </div>
+                                    <div className="filter-dropdown-trailing">
+                                      <span className="filter-dropdown-count">
+                                        {topic.count}
+                                      </span>
+                                      <span
+                                        className={cn(
+                                          "filter-dropdown-check",
+                                          selected
+                                            ? "opacity-100"
+                                            : "opacity-0",
+                                        )}
+                                      >
+                                        <Check size={11} aria-hidden="true" />
+                                      </span>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        </div>
+                      )}
+                    </AnimatePresence>,
+                    document.body,
+                  )}
               </>
             ) : (
               <>
@@ -554,17 +694,17 @@ export function AppSidebar({
             <button
               onClick={goToPrev}
               disabled={!canGoPrev}
-              className="glass-btn flex h-7 w-7 items-center justify-center rounded-lg text-foreground/60 transition-all duration-150 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-25"
+              className="glass-btn flex h-7 w-7 items-center justify-center rounded-lg text-black disabled:cursor-not-allowed disabled:opacity-25 dark:text-white"
               aria-label="Previous month"
             >
               <ChevronLeft size={13} strokeWidth={2.5} />
             </button>
 
             <div className="flex flex-col items-center gap-0.5">
-              <span className="font-mono text-[13px] font-semibold tracking-[0.5px] text-foreground select-none">
+              <span className="select-none font-mono text-[13px] font-semibold tracking-[0.5px] text-black dark:text-white">
                 {currentMonth?.month}
               </span>
-              <span className="font-mono text-[10px] tracking-[1.4px] text-muted-foreground/55 select-none">
+              <span className="select-none font-mono text-[10px] tracking-[1.4px] text-black dark:text-white">
                 {currentMonth?.year}
               </span>
             </div>
@@ -572,7 +712,7 @@ export function AppSidebar({
             <button
               onClick={goToNext}
               disabled={!canGoNext}
-              className="glass-btn flex h-7 w-7 items-center justify-center rounded-lg text-foreground/60 transition-all duration-150 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-25"
+              className="glass-btn flex h-7 w-7 items-center justify-center rounded-lg text-black disabled:cursor-not-allowed disabled:opacity-25 dark:text-white"
               aria-label="Next month"
             >
               <ChevronRight size={13} strokeWidth={2.5} />
@@ -606,7 +746,7 @@ export function AppSidebar({
             {todayMonthIdx !== -1 && todayMonthIdx !== monthIndex && (
               <button
                 onClick={jumpToToday}
-                className="font-mono text-[9px] tracking-[1.3px] text-muted-foreground/45 hover:text-foreground uppercase transition-colors"
+                className="font-mono text-[9px] uppercase tracking-[1.3px] text-black dark:text-white"
               >
                 Today {"\u2192"}
               </button>
@@ -615,7 +755,7 @@ export function AppSidebar({
 
           <div className="flex-1 overflow-y-auto px-3 pb-3">
             <div className="mb-2 flex items-center px-1.5">
-              <span className="font-mono text-[8.5px] tracking-[1.8px] text-muted-foreground/28 uppercase select-none">
+              <span className="select-none font-mono text-[8.5px] uppercase tracking-[1.8px] text-black dark:text-white">
                 {"\u2661"} My favourites
               </span>
             </div>
@@ -624,15 +764,24 @@ export function AppSidebar({
               <div className="flex flex-col gap-0.5">
                 <AnimatePresence mode="popLayout" initial={false}>
                   {filteredRecentEntries.map((entry, i) => {
-                    const accent = entry.primary_color || getTopicColor(entry.icon_name) || "#737373";
-                    const label = TOPICS[getTopicKeyFromEntry(entry.genre, entry.icon_name)]?.label ?? "Misc";
+                    const accent =
+                      entry.primary_color ||
+                      getTopicColor(entry.icon_name) ||
+                      "#737373";
+                    const label =
+                      TOPICS[getTopicKeyFromEntry(entry.genre, entry.icon_name)]
+                        ?.label ?? "Misc";
                     return (
                       <motion.div
                         key={entry.date}
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.18, delay: i * 0.025, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{
+                          duration: 0.18,
+                          delay: i * 0.025,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
                       >
                         <button
                           onClick={() =>
@@ -648,12 +797,16 @@ export function AppSidebar({
                           }
                           className={cn(
                             "sidebar-entry-row group/recent w-full",
-                            activeDate === entry.date && "sidebar-entry-row-active",
+                            activeDate === entry.date &&
+                              "sidebar-entry-row-active",
                           )}
                         >
                           <span
                             className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-150 group-hover/recent:scale-125"
-                            style={{ backgroundColor: accent, opacity: activeDate === entry.date ? 1 : 0.7 }}
+                            style={{
+                              backgroundColor: accent,
+                              opacity: activeDate === entry.date ? 1 : 0.7,
+                            }}
                           />
 
                           <div className="min-w-0 flex-1">
@@ -701,10 +854,6 @@ export function AppSidebar({
 
         <div
           ref={aboutRef}
-          onScroll={(event) => {
-            const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-            setAboutAtBottom(scrollHeight - scrollTop - clientHeight < 40);
-          }}
           className={cn(
             "absolute inset-0 overflow-y-auto flex flex-col transition-all duration-300 ease-out",
             activeView === "about"
@@ -714,27 +863,22 @@ export function AppSidebar({
         >
           <AboutPanel isVisible={activeView === "about"} />
         </div>
-
-        <div
-          className={cn(
-            "sidebar-about-fade absolute bottom-0 left-0 right-0 h-20 pointer-events-none z-30 transition-opacity duration-300",
-            activeView === "about" && !aboutAtBottom ? "opacity-100" : "opacity-0",
-          )}
-        />
       </SidebarContent>
 
       <SidebarFooter className="border-t border-white/10 px-4 pb-2 pt-2.5 flex flex-col gap-2 shrink-0 rounded-none dark:border-white/[0.07]">
         <div className="flex items-center justify-between">
           <Penflow
+            key={penflowColor}
             text="Dhruv Jaradi"
             fontUrl="/fonts/BrittanySignature.ttf"
             quality="balanced"
             size={19}
-            color={isDark ? "#ffffff" : "#1a1a18"}
-            className="opacity-65 transition-opacity duration-300 hover:opacity-90 -translate-y-[3px]"
+            color={penflowColor}
+            className="-translate-y-[3px] opacity-80"
             animate={penflowAnimate}
+            playheadKey={penflowPlayheadKey}
           />
-          <span className="font-mono text-[9px] tracking-[1.5px] text-muted-foreground/30 uppercase select-none">
+          <span className="select-none font-mono text-[9px] uppercase tracking-[1.5px] text-black dark:text-white">
             {new Date().getFullYear()}
           </span>
         </div>

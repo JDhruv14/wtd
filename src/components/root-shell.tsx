@@ -16,8 +16,9 @@ import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { PageTranslator } from "@/components/ui/page-language";
 import { cn } from "@/lib/utils";
 import type { DayData, Entry, MonthData } from "@/lib/types";
+import { socialLinks } from "@/../content/sidebar/profile";
 
-const GITHUB_LINK = "https://github.com/JDhruv14";
+const GITHUB_LINK = socialLinks.github.href;
 
 interface RootShellProps {
   monthsData: MonthData[];
@@ -31,9 +32,11 @@ interface RootShellProps {
 
 function MobileHeader() {
   const { openMobile } = useSidebar();
-  const { ripples: triggerRipples, addRipple: addTriggerRipple } = useGlassRipple();
+  const { ripples: triggerRipples, addRipple: addTriggerRipple } =
+    useGlassRipple();
   const { ripples: themeRipples, addRipple: addThemeRipple } = useGlassRipple();
-  const { ripples: githubRipples, addRipple: addGithubRipple } = useGlassRipple();
+  const { ripples: githubRipples, addRipple: addGithubRipple } =
+    useGlassRipple();
 
   return (
     <header
@@ -47,7 +50,7 @@ function MobileHeader() {
           <GlassRipples ripples={triggerRipples} />
           <SidebarTrigger
             onClick={addTriggerRipple}
-            className="glass-btn size-8 rounded-lg text-foreground/55 hover:text-foreground transition-all duration-200"
+            className="glass-btn size-8 rounded-lg"
             aria-label="Toggle sidebar"
           />
         </div>
@@ -62,7 +65,7 @@ function MobileHeader() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={addGithubRipple}
-            className="glass-btn relative flex size-8 items-center justify-center overflow-hidden rounded-lg text-foreground/55 transition-all duration-200 hover:text-foreground"
+            className="glass-btn glass-btn-static relative flex size-8 items-center justify-center overflow-hidden rounded-lg text-black dark:text-white"
             aria-label="Open GitHub profile — star the repo!"
             title="Star on GitHub"
           >
@@ -82,7 +85,7 @@ function MobileHeader() {
           <GlassRipples ripples={themeRipples} />
           <AnimatedThemeToggle
             onClick={addThemeRipple}
-            className="glass-btn text-foreground size-8 rounded-lg"
+            className="glass-btn glass-btn-static size-8 rounded-lg"
           />
         </div>
       </div>
@@ -100,7 +103,6 @@ export function RootShell({
   const pathname = usePathname();
   const [mobile, setMobile] = useState(false);
   const [activeView, setActiveView] = useState<"day" | "about">("day");
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
   useEffect(() => {
     const onResize = () => setMobile(window.innerWidth < 768);
@@ -138,7 +140,6 @@ export function RootShell({
           onAboutClick={() =>
             setActiveView((v) => (v === "about" ? "day" : "about"))
           }
-          onSubscribeClick={() => setSubscribeOpen(true)}
           activeView={activeView}
           totalEntries={allEntryDates.length}
           recentEntries={recentEntries}
@@ -151,26 +152,6 @@ export function RootShell({
           </div>
         </SidebarInset>
       </SidebarProvider>
-
-      {subscribeOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:items-end md:justify-start md:p-2">
-          <div
-            className="absolute inset-0 bg-foreground/40 backdrop-blur-md md:bg-foreground/[0.02] md:backdrop-blur-none"
-            onClick={() => setSubscribeOpen(false)}
-          />
-          <div
-            className="relative z-10 md:mb-[48px] md:ml-[117px]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <SubscribeCard
-              onSubscribe={async (_email: string) => {
-                localStorage.setItem("has_subscribed", "true");
-              }}
-              onClose={() => setSubscribeOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </>
   );
 }

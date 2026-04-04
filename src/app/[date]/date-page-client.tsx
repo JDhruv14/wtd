@@ -36,7 +36,7 @@ export function DatePageClient({ entry, allEntryDates }: DatePageClientProps) {
   }, []);
 
   useEffect(() => {
-    setIsNavigatingRandom(false);
+    queueMicrotask(() => setIsNavigatingRandom(false));
   }, [pathname]);
 
   const handleRandomClick = () => {
@@ -54,7 +54,9 @@ export function DatePageClient({ entry, allEntryDates }: DatePageClientProps) {
     <EntryView
       entry={entry}
       isMobile={mobile}
-      initialMetadata={entry && !("isEmpty" in entry) ? entry.initialMetadata ?? null : null}
+      initialMetadata={
+        entry && !("isEmpty" in entry) ? (entry.initialMetadata ?? null) : null
+      }
       allEntryDates={allEntryDates}
       isNavigating={isNavigatingRandom}
       navigatingMessage={navigatingMessage}

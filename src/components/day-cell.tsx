@@ -61,7 +61,9 @@ export function DayCell({
       dynamicStyle.boxShadow = color
         ? `inset 0 0 0 1.5px ${color}80`
         : `inset 0 0 0 1.5px rgba(10,10,10,0.4)`;
-      dynamicStyle.backgroundColor = color ? `${color}14` : `rgba(10,10,10,0.07)`;
+      dynamicStyle.backgroundColor = color
+        ? `${color}14`
+        : `rgba(10,10,10,0.07)`;
       if (isOptimistic) dynamicStyle.opacity = 0.6;
     } else if (forceShowIcon && activeColor) {
       dynamicStyle.backgroundColor = `${activeColor}14`;
@@ -78,7 +80,7 @@ export function DayCell({
   let baseClass = "";
   if (!isEmpty) {
     if (skipped) {
-      baseClass = "text-muted-foreground/30 rounded-lg";
+      baseClass = "rounded-lg text-black/50 dark:text-white/50";
     } else {
       baseClass = `rounded-lg ${clickable ? "cursor-pointer" : ""}`;
     }
@@ -87,8 +89,10 @@ export function DayCell({
   // Icon color: in filter mode use the same activeColor for consistency
   const iconColor = forceShowIcon
     ? (activeColor ?? undefined)
-    : ((hovered || isSelected) && color ? color : undefined);
-  const iconClass = "text-foreground";
+    : (hovered || isSelected) && color
+      ? color
+      : undefined;
+  const iconClass = "text-black dark:text-white";
 
   return (
     <div
@@ -99,7 +103,9 @@ export function DayCell({
       onMouseLeave={() => setHovered(false)}
       role={clickable ? "button" : undefined}
       tabIndex={clickable ? 0 : undefined}
-      onKeyDown={clickable ? e => e.key === "Enter" && onClick?.() : undefined}
+      onKeyDown={
+        clickable ? (e) => e.key === "Enter" && onClick?.() : undefined
+      }
     >
       {!isEmpty && (
         <>
@@ -108,7 +114,9 @@ export function DayCell({
             className={`absolute inset-0 flex items-center justify-center font-mono font-medium tracking-premium select-none transition-opacity duration-150 ${
               size === "sm" ? "text-[12px]" : "text-[18px]"
             } ${showNumber ? "opacity-100" : "opacity-0"} ${
-              isSelected ? "text-foreground" : skipped ? "text-muted-foreground/30" : "text-foreground"
+              skipped
+                ? "text-black/50 dark:text-white/50"
+                : "text-black dark:text-white"
             }`}
           >
             {day}
@@ -142,10 +150,24 @@ export function DayCell({
                 height={size === "sm" ? 14 : 18}
                 viewBox="0 0 16 16"
                 fill="none"
-                className="text-muted-foreground/40"
+                className="text-black/50 dark:text-white/50"
               >
-                <circle cx="8" cy="8" r="5.75" stroke="currentColor" strokeWidth="1.15" />
-                <line x1="4.2" y1="11.8" x2="11.8" y2="4.2" stroke="currentColor" strokeWidth="1.15" strokeLinecap="round" />
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="5.75"
+                  stroke="currentColor"
+                  strokeWidth="1.15"
+                />
+                <line
+                  x1="4.2"
+                  y1="11.8"
+                  x2="11.8"
+                  y2="4.2"
+                  stroke="currentColor"
+                  strokeWidth="1.15"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
           )}
@@ -154,7 +176,9 @@ export function DayCell({
           {isToday && (
             <span
               className={`absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full transition-all duration-200 ${
-                isSelected ? "w-1 h-1 bg-foreground/40" : "w-1 h-1 bg-foreground/50"
+                isSelected
+                  ? "h-1 w-1 bg-black/45 dark:bg-white/45"
+                  : "h-1 w-1 bg-black/55 dark:bg-white/55"
               } ${showNumber ? "opacity-100" : "opacity-0"}`}
             />
           )}

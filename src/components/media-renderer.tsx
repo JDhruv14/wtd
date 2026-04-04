@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Icon } from "@/components/icon";
 import { getTopicColor } from "@/lib/topics";
 import type { Entry, EntryMetadata } from "@/lib/types";
@@ -11,7 +12,41 @@ interface MediaRendererProps {
   isLoadingMetadata?: boolean;
 }
 
-function LinkPreviewCard({ mediaUrl, metadata, isLoading }: { mediaUrl: string; metadata: EntryMetadata | null; isLoading?: boolean }) {
+function FaviconIcon({ hostname }: { hostname: string | null }) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    queueMicrotask(() => setFailed(false));
+  }, [hostname]);
+
+  const src =
+    hostname && !failed
+      ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`
+      : "/globe.svg";
+
+  return (
+    <Image
+      src={src}
+      alt=""
+      width={32}
+      height={32}
+      className="h-3 w-3 flex-shrink-0 rounded-[2px] opacity-60 transition-opacity duration-200 group-hover:opacity-100"
+      onError={() => {
+        if (hostname && !failed) setFailed(true);
+      }}
+    />
+  );
+}
+
+function LinkPreviewCard({
+  mediaUrl,
+  metadata,
+  isLoading,
+}: {
+  mediaUrl: string;
+  metadata: EntryMetadata | null;
+  isLoading?: boolean;
+}) {
   let hostname: string | null = null;
   try {
     hostname = new URL(mediaUrl).hostname;
@@ -23,7 +58,7 @@ function LinkPreviewCard({ mediaUrl, metadata, isLoading }: { mediaUrl: string; 
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    setImageError(false);
+    queueMicrotask(() => setImageError(false));
   }, [metadata?.image]);
 
   useEffect(() => {
@@ -97,21 +132,16 @@ function LinkPreviewCard({ mediaUrl, metadata, isLoading }: { mediaUrl: string; 
           rel="noopener noreferrer"
           className="flex items-center px-3 py-1 rounded-full bg-accent group hover:bg-accent/80 transition-colors duration-200"
         >
-          <img
-            src={hostname ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=32` : "/globe.svg"}
-            alt=""
-            className="w-3 h-3 rounded-[2px] opacity-60 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0"
-            onError={(event) => {
-              const target = event.currentTarget;
-              target.onerror = null;
-              target.src = "/globe.svg";
-            }}
-          />
+          <FaviconIcon hostname={hostname} />
           <span className="font-sans text-[11px] text-muted-foreground group-hover:text-foreground transition-colors duration-200 tracking-wide ml-1.5">
             {hostname ?? mediaUrl}
           </span>
           <div className="flex items-center overflow-hidden transition-all duration-300 ease-out max-w-[20px] opacity-100 md:max-w-0 md:opacity-0 md:group-hover:max-w-[20px] md:group-hover:opacity-100">
-            <Icon name="arrow-up-right" className="text-muted-foreground group-hover:text-foreground transition-colors duration-150 ml-2" style={{ width: "12px", height: "12px" }} />
+            <Icon
+              name="arrow-up-right"
+              className="text-muted-foreground group-hover:text-foreground transition-colors duration-150 ml-2"
+              style={{ width: "12px", height: "12px" }}
+            />
           </div>
         </a>
       </div>
@@ -119,7 +149,9 @@ function LinkPreviewCard({ mediaUrl, metadata, isLoading }: { mediaUrl: string; 
       <div className="w-full relative group p-1">
         <div
           className={`w-full relative overflow-hidden rounded-[8px] flex items-center justify-center transition-colors duration-500 ${
-            isLoading || !metadata?.image || imageError ? "min-h-[424px]" : "max-h-[480px]"
+            isLoading || !metadata?.image || imageError
+              ? "min-h-[424px]"
+              : "max-h-[480px]"
           }`}
           style={{ backgroundColor: dominantColor || "var(--muted)" }}
         >
@@ -128,11 +160,25 @@ function LinkPreviewCard({ mediaUrl, metadata, isLoading }: { mediaUrl: string; 
               <div className="w-8 h-8 border-2 border-border border-t-foreground animate-spin rounded-full" />
             </div>
           ) : metadata?.image && !imageError ? (
-            <img src={metadata.image} alt={metadata.title} className="w-full h-auto max-h-[432px] object-contain" onError={() => setImageError(true)} />
+            <Image
+              src={metadata.image}
+              alt={metadata.title}
+              width={1200}
+              height={630}
+              sizes="(max-width: 768px) 100vw, min(896px, 100vw)"
+              className="h-auto max-h-[432px] w-full object-contain"
+              style={{ width: "100%", height: "auto" }}
+              onError={() => setImageError(true)}
+            />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center">
-              <Icon name="image-broken" className="w-8 h-8 opacity-30 text-muted-foreground" />
-              <span className="font-mono text-[12px] text-muted-foreground uppercase tracking-widest mt-4">No preview image :/</span>
+              <Icon
+                name="image-broken"
+                className="w-8 h-8 opacity-30 text-muted-foreground"
+              />
+              <span className="font-mono text-[12px] text-muted-foreground uppercase tracking-widest mt-4">
+                No preview image :/
+              </span>
             </div>
           )}
         </div>
@@ -165,9 +211,16 @@ function MediaPlaceholder({ entry }: { entry: Entry }) {
         >
           <div
             className="w-20 h-20 rounded-2xl flex items-center justify-center"
-            style={{ backgroundColor: `${color}28`, boxShadow: `0 0 0 1px ${color}50, 0 8px 32px ${color}30` }}
+            style={{
+              backgroundColor: `${color}28`,
+              boxShadow: `0 0 0 1px ${color}50, 0 8px 32px ${color}30`,
+            }}
           >
-            <Icon name={iconName} size="lg" style={{ color, width: 32, height: 32 }} />
+            <Icon
+              name={iconName}
+              size="lg"
+              style={{ color, width: 32, height: 32 }}
+            />
           </div>
           <span className="font-mono text-[11px] uppercase tracking-[1.8px] text-muted-foreground/40 select-none">
             no media attached
@@ -178,15 +231,42 @@ function MediaPlaceholder({ entry }: { entry: Entry }) {
   );
 }
 
-export function MediaRenderer({ entry, metadata, isLoadingMetadata = false }: MediaRendererProps) {
+export function MediaRenderer({
+  entry,
+  metadata,
+  isLoadingMetadata = false,
+}: MediaRendererProps) {
+  const { media_url: mediaUrl, media_type: mediaType } = entry;
+
+  const treatTweetAsPreview = useMemo(() => {
+    if (!entry.media_url) return false;
+    const url = entry.media_url;
+    const isArticleTweet = url.includes("/article/");
+    const metadataLooksPreview = Boolean(
+      metadata &&
+      metadata.title &&
+      !metadata.title.includes(" on X") &&
+      !metadata.title.includes(" on Twitter") &&
+      metadata.image,
+    );
+
+    return (
+      isArticleTweet ||
+      mediaType === "twitter-article" ||
+      mediaType === "article" ||
+      ["article", "link", "image"].includes(entry.icon_name || "") ||
+      metadataLooksPreview
+    );
+  }, [entry.icon_name, entry.media_url, mediaType, metadata]);
+
   if (!entry.media_url) {
     return <MediaPlaceholder entry={entry} />;
   }
 
-  const { media_url: mediaUrl, media_type: mediaType } = entry;
-
   if (mediaUrl.includes("youtube.com") || mediaUrl.includes("youtu.be")) {
-    const videoId = mediaUrl.includes("youtu.be") ? mediaUrl.split("/").pop()?.split("?")[0] : new URL(mediaUrl).searchParams.get("v");
+    const videoId = mediaUrl.includes("youtu.be")
+      ? mediaUrl.split("/").pop()?.split("?")[0]
+      : new URL(mediaUrl).searchParams.get("v");
 
     return (
       <div className="w-full aspect-video overflow-hidden shadow-2xl bg-foreground border border-border rounded-[12px]">
@@ -208,27 +288,32 @@ export function MediaRenderer({ entry, metadata, isLoadingMetadata = false }: Me
 
     return (
       <div className="w-full overflow-hidden shadow-2xl bg-muted p-1 border border-border rounded-[12px]">
-        <iframe className="rounded-[8px]" src={`https://open.spotify.com/embed${pathname}`} width="100%" height="352" frameBorder="0" allow="encrypted-media" />
+        <iframe
+          className="rounded-[8px]"
+          src={`https://open.spotify.com/embed${pathname}`}
+          width="100%"
+          height="352"
+          frameBorder="0"
+          allow="encrypted-media"
+        />
       </div>
     );
   }
 
-  const treatTweetAsPreview = useMemo(() => {
-    const isArticleTweet = mediaUrl.includes("/article/");
-    const metadataLooksPreview = Boolean(metadata && metadata.title && !metadata.title.includes(" on X") && !metadata.title.includes(" on Twitter") && metadata.image);
-
-    return (
-      isArticleTweet ||
-      mediaType === "twitter-article" ||
-      mediaType === "article" ||
-      ["article", "link", "image"].includes(entry.icon_name || "") ||
-      metadataLooksPreview
-    );
-  }, [entry.icon_name, mediaType, mediaUrl, metadata]);
-
-  if (mediaType === "tweet" || mediaType === "twitter-article" || mediaUrl.includes("twitter.com") || mediaUrl.includes("x.com")) {
+  if (
+    mediaType === "tweet" ||
+    mediaType === "twitter-article" ||
+    mediaUrl.includes("twitter.com") ||
+    mediaUrl.includes("x.com")
+  ) {
     if (treatTweetAsPreview) {
-      return <LinkPreviewCard mediaUrl={mediaUrl} metadata={metadata} isLoading={isLoadingMetadata} />;
+      return (
+        <LinkPreviewCard
+          mediaUrl={mediaUrl}
+          metadata={metadata}
+          isLoading={isLoadingMetadata}
+        />
+      );
     }
 
     return (
@@ -240,19 +325,16 @@ export function MediaRenderer({ entry, metadata, isLoadingMetadata = false }: Me
             rel="noopener noreferrer"
             className="flex items-center px-3 py-1 rounded-full bg-accent group hover:bg-accent/80 transition-colors duration-200"
           >
-            <img
-              src={`https://www.google.com/s2/favicons?domain=${new URL(mediaUrl).hostname}&sz=32`}
-              alt=""
-              className="w-3 h-3 rounded-[2px] opacity-60 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0"
-              onError={(event) => {
-                const target = event.currentTarget;
-                target.onerror = null;
-                target.src = "/globe.svg";
-              }}
-            />
-            <span className="font-sans text-[11px] text-muted-foreground group-hover:text-foreground transition-colors duration-200 tracking-wide ml-1.5">x.com</span>
+            <FaviconIcon hostname={new URL(mediaUrl).hostname} />
+            <span className="font-sans text-[11px] text-muted-foreground group-hover:text-foreground transition-colors duration-200 tracking-wide ml-1.5">
+              x.com
+            </span>
             <div className="flex items-center overflow-hidden transition-all duration-300 ease-out max-w-[20px] opacity-100 md:max-w-0 md:opacity-0 md:group-hover:max-w-[20px] md:group-hover:opacity-100">
-              <Icon name="arrow-up-right" className="text-muted-foreground group-hover:text-foreground transition-colors duration-150 ml-2" style={{ width: "12px", height: "12px" }} />
+              <Icon
+                name="arrow-up-right"
+                className="text-muted-foreground group-hover:text-foreground transition-colors duration-150 ml-2"
+                style={{ width: "12px", height: "12px" }}
+              />
             </div>
           </a>
         </div>
@@ -265,20 +347,38 @@ export function MediaRenderer({ entry, metadata, isLoadingMetadata = false }: Me
             className="w-full max-w-[550px] min-h-[320px] rounded-[12px] border border-border bg-muted/50 hover:bg-muted transition-colors flex flex-col items-center justify-center gap-3"
           >
             <Icon name="tweet" className="text-muted-foreground w-8 h-8" />
-            <p className="font-sans text-sm text-muted-foreground">Open tweet on X</p>
+            <p className="font-sans text-sm text-muted-foreground">
+              Open tweet on X
+            </p>
           </a>
         </div>
       </div>
     );
   }
 
-  if (mediaType === "link" || mediaType === "peerlist" || mediaType === "article") {
-    return <LinkPreviewCard mediaUrl={mediaUrl} metadata={metadata} isLoading={isLoadingMetadata} />;
+  if (
+    mediaType === "link" ||
+    mediaType === "peerlist" ||
+    mediaType === "article"
+  ) {
+    return (
+      <LinkPreviewCard
+        mediaUrl={mediaUrl}
+        metadata={metadata}
+        isLoading={isLoadingMetadata}
+      />
+    );
   }
 
   return (
-    <div className="w-full aspect-video overflow-hidden shadow-2xl border border-border group rounded-[12px]">
-      <img src={mediaUrl} alt={entry.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" />
+    <div className="group relative aspect-video w-full overflow-hidden rounded-[12px] border border-border shadow-2xl">
+      <Image
+        src={mediaUrl}
+        alt={entry.title}
+        fill
+        sizes="(max-width: 768px) 100vw, min(896px, 100vw)"
+        className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+      />
     </div>
   );
 }

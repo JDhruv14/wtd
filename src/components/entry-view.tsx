@@ -63,7 +63,8 @@ function BearSvg({ className }: { className?: string }) {
 function DesktopUtilityRail() {
   const { state: sidebarState } = useSidebar();
   const { ripples, addRipple } = useGlassRipple();
-  const { ripples: githubRipples, addRipple: addGithubRipple } = useGlassRipple();
+  const { ripples: githubRipples, addRipple: addGithubRipple } =
+    useGlassRipple();
   const expanded = sidebarState === "expanded";
 
   const rightPos = "18px";
@@ -73,20 +74,23 @@ function DesktopUtilityRail() {
       {!expanded && (
         <div className="fixed left-[18px] top-3 pt-4 z-40">
           <SidebarTrigger
-            className="glass-btn size-8 rounded-lg text-foreground/55 hover:text-foreground transition-all duration-200"
+            className="glass-btn size-8 rounded-lg"
             aria-label="Toggle sidebar"
           />
         </div>
       )}
 
-      <div className="fixed top-3 pt-4 z-40 flex items-center gap-3" style={{ right: rightPos }}>
+      <div
+        className="fixed top-3 pt-4 z-40 flex items-center gap-3"
+        style={{ right: rightPos }}
+      >
         <span className="relative inline-flex">
           <a
             href={GITHUB_LINK}
             target="_blank"
             rel="noopener noreferrer"
             onClick={addGithubRipple}
-            className="glass-btn relative flex size-8 items-center justify-center overflow-hidden rounded-lg text-foreground/55 transition-all duration-200 hover:text-foreground"
+            className="glass-btn glass-btn-static relative flex size-8 items-center justify-center overflow-hidden rounded-lg text-black dark:text-white"
             aria-label="Open GitHub profile — star the repo!"
             title="Star on GitHub"
           >
@@ -105,7 +109,7 @@ function DesktopUtilityRail() {
         <div className="relative overflow-hidden rounded-lg">
           <GlassRipples ripples={ripples} />
           <AnimatedThemeToggle
-            className="glass-btn size-8 rounded-lg text-foreground/55 hover:text-foreground transition-all duration-200"
+            className="glass-btn glass-btn-static size-8 rounded-lg"
             onClick={addRipple}
           />
         </div>
@@ -124,20 +128,62 @@ export function EntryView({
   navigatingMessage = "",
   onRandomClick = () => undefined,
 }: EntryViewProps) {
-  const [metadata, setMetadata] = useState<EntryMetadata | null>(initialMetadata);
+  const [metadata, setMetadata] = useState<EntryMetadata | null>(
+    initialMetadata,
+  );
   const [loadingMetadata, setLoadingMetadata] = useState(
     !initialMetadata &&
       !!entry &&
       "media_type" in entry &&
-      ["link", "twitter-article", "tweet", "article"].includes(entry.media_type),
+      ["link", "twitter-article", "tweet", "article"].includes(
+        entry.media_type,
+      ),
   );
   const { state: sidebarState } = useSidebar();
 
   const articleScrollRef = useRef<HTMLDivElement>(null);
 
+  const contentEntry: Entry | null =
+    !isLoading && entry && !("isEmpty" in entry) ? (entry as Entry) : null;
+
+  const entryDescription = useMemo(() => {
+    if (!contentEntry) return null;
+    const fromMetadata = metadata?.description?.trim();
+    if (fromMetadata) return fromMetadata;
+
+    let textContent = contentEntry.content;
+
+    if (textContent?.startsWith('{"type":"doc"')) {
+      try {
+        const json = JSON.parse(textContent) as Record<string, unknown>;
+        const extractText = (node: Record<string, unknown>): string => {
+          if (node.type === "text") return String(node.text ?? "");
+          if (Array.isArray(node.content))
+            return node.content
+              .map((c) => extractText(c as Record<string, unknown>))
+              .join(" ");
+          return "";
+        };
+        textContent = extractText(json);
+      } catch {
+        textContent = "";
+      }
+    }
+
+    const plain = textContent
+      ?.replace(/[#>*`\-\[\]()]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!plain) return null;
+    return plain.slice(0, 170);
+  }, [contentEntry, metadata?.description]);
+
   if (isLoading) {
     return (
-      <div className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full"}`}>
+      <div
+        className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full"}`}
+      >
         {!isMobile && <DesktopUtilityRail />}
         <div
           className={`w-full max-w-[980px] self-center px-6 md:px-10 pb-32 ${isMobile ? "pt-6" : "pt-24"}`}
@@ -172,7 +218,9 @@ export function EntryView({
 
   if ("isEmpty" in entry && entry.isEmpty) {
     return (
-      <div className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full py-12"}`}>
+      <div
+        className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full py-12"}`}
+      >
         {!isMobile && <DesktopUtilityRail />}
         <div className="flex-1 flex items-center justify-center">
           <div
@@ -181,8 +229,8 @@ export function EntryView({
           >
             <BearSvg className="w-28 h-28 text-muted-foreground dark:text-white mb-5 opacity-60" />
             <p className="font-sans text-[16px] text-muted-foreground/70 mb-8 leading-relaxed">
-              Sorry, I still haven&apos;t written anything yet or don&apos;t feel like writing
-              today
+              Sorry, I still haven&apos;t written anything yet or don&apos;t
+              feel like writing today
             </p>
             {allEntryDates.length > 0 && (
               <button
@@ -206,50 +254,24 @@ export function EntryView({
     getTopicColor(currentEntry.icon_name) ||
     "#737373";
 
-  const topicLabel = TOPICS[currentEntry.icon_name ?? "sparkle"]?.label ?? "Archive";
-  const genreList = (currentEntry.genre ?? currentEntry.keywords)
-    ?.split(/[|,]/)
-    .map((g) => g.trim())
-    .filter(Boolean)
-    .slice(0, 6) ?? [];
+  const topicLabel =
+    TOPICS[currentEntry.icon_name ?? "sparkle"]?.label ?? "Archive";
+  const genreList =
+    (currentEntry.genre ?? currentEntry.keywords)
+      ?.split(/[|,]/)
+      .map((g) => g.trim())
+      .filter(Boolean)
+      .slice(0, 6) ?? [];
   const entryDateLabel = formatEntryDate(currentEntry.date);
   const desktopWidthClass =
     !isMobile && sidebarState === "expanded"
       ? "md:max-w-[780px]"
       : "md:max-w-[920px]";
 
-  const entryDescription = useMemo(() => {
-    const fromMetadata = metadata?.description?.trim();
-    if (fromMetadata) return fromMetadata;
-
-    let textContent = currentEntry.content;
-
-    // Extract plain text from TipTap JSON instead of leaking raw JSON
-    if (textContent?.startsWith('{"type":"doc"')) {
-      try {
-        const json = JSON.parse(textContent);
-        const extractText = (node: any): string => {
-          if (node.type === "text") return node.text || "";
-          if (node.content) return node.content.map(extractText).join(" ");
-          return "";
-        };
-        textContent = extractText(json);
-      } catch {
-        textContent = "";
-      }
-    }
-
-    const plain = textContent
-      ?.replace(/[#>*`\-\[\]()]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    if (!plain) return null;
-    return plain.slice(0, 170);
-  }, [currentEntry.content, metadata?.description]);
-
   return (
-    <div className={`flex-1 bg-background relative ${!isMobile ? "h-full overflow-hidden" : "min-h-full"}`}>
+    <div
+      className={`flex-1 bg-background relative ${!isMobile ? "h-full overflow-hidden" : "min-h-full"}`}
+    >
       <div
         style={{
           background: `radial-gradient(circle at 18% 0%, ${overlayColor}18 0%, transparent 42%), radial-gradient(circle at 85% 8%, ${overlayColor}10 0%, transparent 28%)`,
@@ -330,7 +352,10 @@ export function EntryView({
                   style={{ fontSize: "var(--reading-font-size, 16px)" }}
                 >
                   <ContentParser
-                    content={currentEntry.content || "No description available for this day."}
+                    content={
+                      currentEntry.content ||
+                      "No description available for this day."
+                    }
                   />
                 </div>
               </div>

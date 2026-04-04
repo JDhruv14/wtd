@@ -74,8 +74,10 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
   // Fetch real like count + this IP's tap count from Redis
   useEffect(() => {
     if (!entry?.date) return;
-    setApiCount(null);
-    setApiTaps(0);
+    queueMicrotask(() => {
+      setApiCount(null);
+      setApiTaps(0);
+    });
     fetch(`/api/like?date=${entry.date}`)
       .then((r) => r.json())
       .then((d) => {
@@ -159,7 +161,9 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
     }
   };
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   useEffect(() => {
     if (!shareOpen) return;
@@ -223,7 +227,9 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
     <div
       className={cn(
         "fixed bottom-8 z-[75] flex -translate-x-1/2 items-center gap-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
-        isMobile && openMobile && "pointer-events-none -translate-y-2 opacity-0",
+        isMobile &&
+          openMobile &&
+          "pointer-events-none -translate-y-2 opacity-0",
       )}
       style={{ left: dockLeft }}
     >
@@ -273,7 +279,9 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
             <div className="relative size-5 flex items-center justify-center shrink-0">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
-                  key={shareFeedback === "copied" ? "share-check" : "share-icon"}
+                  key={
+                    shareFeedback === "copied" ? "share-check" : "share-icon"
+                  }
                   initial={{ scale: 0, rotate: 24, opacity: 0 }}
                   animate={{ scale: 1, rotate: 0, opacity: 1 }}
                   exit={{ scale: 0, rotate: -24, opacity: 0 }}
@@ -291,7 +299,9 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
             <span className="font-mono text-[12px] text-foreground/80 min-w-[2.4rem]">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span
-                  key={shareFeedback === "copied" ? "shared-label" : "share-label"}
+                  key={
+                    shareFeedback === "copied" ? "shared-label" : "share-label"
+                  }
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -4 }}
@@ -305,62 +315,67 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
           </button>
 
           {/* Share dropdown — portalled to body so backdrop-filter blurs page content */}
-          {mounted && createPortal(
-            <AnimatePresence>
-              {shareOpen && (
-                <div
-                  ref={shareMenuRef}
-                  className="glass-dock dropdown-panel fixed z-[90] w-[148px] rounded-[16px] p-1.5"
-                  style={{ right: shareMenuPos.right, bottom: shareMenuPos.bottom }}
-                >
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                    transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                    className="share-dropdown"
+          {mounted &&
+            createPortal(
+              <AnimatePresence>
+                {shareOpen && (
+                  <div
+                    ref={shareMenuRef}
+                    className="glass-dock dropdown-panel fixed z-[90] w-[148px] rounded-[16px] p-1.5"
+                    style={{
+                      right: shareMenuPos.right,
+                      bottom: shareMenuPos.bottom,
+                    }}
                   >
-                    <button
-                      type="button"
-                      onClick={(event) => void copyPageUrl(event)}
-                      className="share-dropdown-row"
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                      transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                      className="share-dropdown"
                     >
-                      <Copy size={13} />
-                      <span>Copy link</span>
-                    </button>
-                    <a
-                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="share-dropdown-row"
-                      onClick={() => setShareOpen(false)}
-                    >
-                      <Icon name="brand-x" size="sm" />
-                      <span>Post to X</span>
-                    </a>
-                    {typeof navigator !== "undefined" && "share" in navigator && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          await navigator.share({
-                            title: entry.title || "btw",
-                            text: shareText,
-                            url: shareUrl,
-                          });
-                          setShareOpen(false);
-                        }}
+                        onClick={(event) => void copyPageUrl(event)}
                         className="share-dropdown-row"
                       >
-                        <Link size={13} />
-                        <span>More options</span>
+                        <Copy size={13} />
+                        <span>Copy link</span>
                       </button>
-                    )}
-                  </motion.div>
-                </div>
-              )}
-            </AnimatePresence>,
-            document.body,
-          )}
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="share-dropdown-row"
+                        onClick={() => setShareOpen(false)}
+                      >
+                        <Icon name="brand-x" size="sm" />
+                        <span>Post to X</span>
+                      </a>
+                      {typeof navigator !== "undefined" &&
+                        "share" in navigator && (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await navigator.share({
+                                title: entry.title || "btw",
+                                text: shareText,
+                                url: shareUrl,
+                              });
+                              setShareOpen(false);
+                            }}
+                            className="share-dropdown-row"
+                          >
+                            <Link size={13} />
+                            <span>More options</span>
+                          </button>
+                        )}
+                    </motion.div>
+                  </div>
+                )}
+              </AnimatePresence>,
+              document.body,
+            )}
         </div>
       </div>
 

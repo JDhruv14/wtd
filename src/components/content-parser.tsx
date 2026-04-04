@@ -1,7 +1,14 @@
 import type { ReactNode } from "react";
 import { Fragment } from "react";
+import Image from "next/image";
 
-function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
+function ExternalLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
   return (
     <a
       href={href}
@@ -18,7 +25,8 @@ function ExternalLink({ href, children }: { href: string; children: ReactNode })
 
 function getYouTubeId(url: string): string | null {
   try {
-    if (url.includes("youtu.be")) return url.split("/").pop()?.split("?")[0] ?? null;
+    if (url.includes("youtu.be"))
+      return url.split("/").pop()?.split("?")[0] ?? null;
     return new URL(url).searchParams.get("v");
   } catch {
     return null;
@@ -72,7 +80,15 @@ function InlineVideo({ url }: { url: string }) {
   // Fallback: image URL
   return (
     <div className="my-6 w-full overflow-hidden rounded-[12px] border border-border shadow-lg">
-      <img src={url} alt="" className="w-full h-auto object-cover" />
+      <Image
+        src={url}
+        alt=""
+        width={1600}
+        height={900}
+        sizes="(max-width: 768px) 100vw, min(896px, 100vw)"
+        className="h-auto w-full object-cover"
+        style={{ width: "100%", height: "auto" }}
+      />
     </div>
   );
 }
@@ -81,7 +97,15 @@ function InlineImage({ url, caption }: { url: string; caption?: string }) {
   return (
     <figure className="my-6 w-full">
       <div className="overflow-hidden rounded-[12px] border border-border shadow-lg">
-        <img src={url} alt={caption ?? ""} className="w-full h-auto object-cover" />
+        <Image
+          src={url}
+          alt={caption ?? ""}
+          width={1600}
+          height={900}
+          sizes="(max-width: 768px) 100vw, min(896px, 100vw)"
+          className="h-auto w-full object-cover"
+          style={{ width: "100%", height: "auto" }}
+        />
       </div>
       {caption && (
         <figcaption className="mt-2 text-center font-mono text-[11px] text-muted-foreground/55 tracking-wide">
@@ -109,14 +133,28 @@ function parseInlineMarkdown(text: string): ReactNode[] {
   let idx = 0;
   while ((match = re.exec(text)) !== null) {
     if (match.index > last) {
-      tokens.push(<Fragment key={`t-${idx++}`}>{text.slice(last, match.index)}</Fragment>);
+      tokens.push(
+        <Fragment key={`t-${idx++}`}>{text.slice(last, match.index)}</Fragment>,
+      );
     }
     if (match[0].startsWith("**")) {
-      tokens.push(<strong key={`b-${idx++}`} className="font-bold text-foreground">{match[2]}</strong>);
+      tokens.push(
+        <strong key={`b-${idx++}`} className="font-bold text-foreground">
+          {match[2]}
+        </strong>,
+      );
     } else if (match[0].startsWith("*")) {
-      tokens.push(<em key={`i-${idx++}`} className="italic text-foreground/88">{match[3]}</em>);
+      tokens.push(
+        <em key={`i-${idx++}`} className="italic text-foreground/88">
+          {match[3]}
+        </em>,
+      );
     } else if (match[4] && match[5]) {
-      tokens.push(<ExternalLink key={`l-${idx++}`} href={match[5]}>{match[4]}</ExternalLink>);
+      tokens.push(
+        <ExternalLink key={`l-${idx++}`} href={match[5]}>
+          {match[4]}
+        </ExternalLink>,
+      );
     }
     last = match.index + match[0].length;
   }
@@ -136,11 +174,15 @@ function renderTipTapNode(node: any, key: React.Key): ReactNode {
     if (node.marks) {
       for (const mark of node.marks) {
         if (mark.type === "bold") {
-          content = <strong className="font-bold text-foreground">{content}</strong>;
+          content = (
+            <strong className="font-bold text-foreground">{content}</strong>
+          );
         } else if (mark.type === "italic") {
           content = <em className="italic text-foreground/90">{content}</em>;
         } else if (mark.type === "link") {
-          content = <ExternalLink href={mark.attrs.href}>{content}</ExternalLink>;
+          content = (
+            <ExternalLink href={mark.attrs.href}>{content}</ExternalLink>
+          );
         }
       }
     }
@@ -157,22 +199,48 @@ function renderTipTapNode(node: any, key: React.Key): ReactNode {
     case "doc":
       return <div key={key}>{children}</div>;
     case "paragraph":
-      return <p key={key} className="mb-4 last:mb-0 leading-relaxed text-foreground">{children}</p>;
+      return (
+        <p key={key} className="mb-4 last:mb-0 leading-relaxed text-foreground">
+          {children}
+        </p>
+      );
     case "heading": {
       const level = node.attrs.level;
-      const cls = level === 1 ? "text-2xl font-bold mb-6 mt-2 text-foreground" : "text-xl font-semibold mb-4 mt-2 text-foreground";
+      const cls =
+        level === 1
+          ? "text-2xl font-bold mb-6 mt-2 text-foreground"
+          : "text-xl font-semibold mb-4 mt-2 text-foreground";
       const Tag = `h${level}` as "h1" | "h2" | "h3";
-      return <Tag key={key} className={cls}>{children}</Tag>;
+      return (
+        <Tag key={key} className={cls}>
+          {children}
+        </Tag>
+      );
     }
     case "bulletList":
-      return <ul key={key} className="list-disc ml-6 mb-6 flex flex-col gap-2">{children}</ul>;
+      return (
+        <ul key={key} className="list-disc ml-6 mb-6 flex flex-col gap-2">
+          {children}
+        </ul>
+      );
     case "orderedList":
-      return <ol key={key} className="list-decimal ml-6 mb-6 flex flex-col gap-2">{children}</ol>;
+      return (
+        <ol key={key} className="list-decimal ml-6 mb-6 flex flex-col gap-2">
+          {children}
+        </ol>
+      );
     case "listItem":
-      return <li key={key} className="pl-1 leading-relaxed">{children}</li>;
+      return (
+        <li key={key} className="pl-1 leading-relaxed">
+          {children}
+        </li>
+      );
     case "blockquote":
       return (
-        <blockquote key={key} className="my-6 pl-5 border-l-2 border-border py-2 italic text-muted-foreground bg-muted/40 rounded-r-lg">
+        <blockquote
+          key={key}
+          className="my-6 pl-5 border-l-2 border-border py-2 italic text-muted-foreground bg-muted/40 rounded-r-lg"
+        >
           {children}
         </blockquote>
       );
@@ -190,11 +258,14 @@ export function ContentParser({ content }: { content?: string | null }) {
 
   // TipTap JSON (legacy entries from the Supabase era)
   if (content.startsWith('{"type":"doc"')) {
+    let tipTapJson: unknown = null;
     try {
-      const tipTapJson = JSON.parse(content);
-      return <>{renderTipTapNode(tipTapJson, "doc")}</>;
+      tipTapJson = JSON.parse(content);
     } catch {
-      // fall through to markdown
+      tipTapJson = null;
+    }
+    if (tipTapJson !== null && typeof tipTapJson === "object") {
+      return <>{renderTipTapNode(tipTapJson, "doc")}</>;
     }
   }
 
@@ -211,7 +282,10 @@ export function ContentParser({ content }: { content?: string | null }) {
         className="my-6 pl-5 border-l-2 border-border py-1 transition-colors duration-300 hover:border-foreground/20"
       >
         {quoteBlock.map((line, i) => (
-          <p key={i} className="italic text-muted-foreground leading-relaxed mb-3 last:mb-0">
+          <p
+            key={i}
+            className="italic text-muted-foreground leading-relaxed mb-3 last:mb-0"
+          >
             {parseInlineMarkdown(line)}
           </p>
         ))}
@@ -238,14 +312,26 @@ export function ContentParser({ content }: { content?: string | null }) {
     // @![caption](url) — inline image with caption
     const atImage = line.match(/^@!\[([^\]]*)\]\((.+)\)$/);
     if (atImage) {
-      rendered.push(<InlineImage key={index} url={atImage[2].trim()} caption={atImage[1] || undefined} />);
+      rendered.push(
+        <InlineImage
+          key={index}
+          url={atImage[2].trim()}
+          caption={atImage[1] || undefined}
+        />,
+      );
       return;
     }
 
     // Standard markdown image ![alt](url)
     const mdImage = line.match(/^!\[([^\]]*)\]\((.+)\)$/);
     if (mdImage) {
-      rendered.push(<InlineImage key={index} url={mdImage[2].trim()} caption={mdImage[1] || undefined} />);
+      rendered.push(
+        <InlineImage
+          key={index}
+          url={mdImage[2].trim()}
+          caption={mdImage[1] || undefined}
+        />,
+      );
       return;
     }
 
@@ -259,9 +345,39 @@ export function ContentParser({ content }: { content?: string | null }) {
     const h3 = line.match(/^### (.+)/);
     const h2 = line.match(/^## (.+)/);
     const h1 = line.match(/^# (.+)/);
-    if (h1) { rendered.push(<h1 key={index} className="text-2xl font-bold mb-4 mt-2 text-foreground">{parseInlineMarkdown(h1[1])}</h1>); return; }
-    if (h2) { rendered.push(<h2 key={index} className="text-xl font-semibold mb-3 mt-2 text-foreground">{parseInlineMarkdown(h2[1])}</h2>); return; }
-    if (h3) { rendered.push(<h3 key={index} className="text-lg font-semibold mb-2 mt-2 text-foreground">{parseInlineMarkdown(h3[1])}</h3>); return; }
+    if (h1) {
+      rendered.push(
+        <h1
+          key={index}
+          className="text-2xl font-bold mb-4 mt-2 text-foreground"
+        >
+          {parseInlineMarkdown(h1[1])}
+        </h1>,
+      );
+      return;
+    }
+    if (h2) {
+      rendered.push(
+        <h2
+          key={index}
+          className="text-xl font-semibold mb-3 mt-2 text-foreground"
+        >
+          {parseInlineMarkdown(h2[1])}
+        </h2>,
+      );
+      return;
+    }
+    if (h3) {
+      rendered.push(
+        <h3
+          key={index}
+          className="text-lg font-semibold mb-2 mt-2 text-foreground"
+        >
+          {parseInlineMarkdown(h3[1])}
+        </h3>,
+      );
+      return;
+    }
 
     // List item
     const li = line.match(/^[-*] (.+)/);

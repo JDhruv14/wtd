@@ -91,7 +91,11 @@ export function PageTranslator() {
     hideTranslateArtifacts();
 
     const observer = new MutationObserver(() => hideTranslateArtifacts());
-    observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+    });
 
     if (document.getElementById("google-translate-script")) {
       return () => observer.disconnect();
@@ -103,7 +107,9 @@ export function PageTranslator() {
         {
           pageLanguage: "en",
           autoDisplay: false,
-          includedLanguages: LANGUAGE_OPTIONS.map((option) => option.code).join(","),
+          includedLanguages: LANGUAGE_OPTIONS.map((option) => option.code).join(
+            ",",
+          ),
           layout: 0,
         },
         "google_translate_element",
@@ -112,7 +118,8 @@ export function PageTranslator() {
 
     const script = document.createElement("script");
     script.id = "google-translate-script";
-    script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.src =
+      "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.body.appendChild(script);
 
@@ -122,7 +129,13 @@ export function PageTranslator() {
     };
   }, []);
 
-  return <div id="google_translate_element" className="page-translate-root" aria-hidden="true" />;
+  return (
+    <div
+      id="google_translate_element"
+      className="page-translate-root"
+      aria-hidden="true"
+    />
+  );
 }
 
 interface LanguageToggleProps {
@@ -171,13 +184,20 @@ function LanguageMenu({
               >
                 <div className="filter-dropdown-row-main">
                   <span className="filter-dropdown-topic-icon">
-                    <span className="font-mono text-[7.8px] leading-none tracking-[1px] text-foreground/82">
+                    <span className="font-mono text-[7.8px] leading-none tracking-[1px] text-black dark:text-white">
                       {option.label}
                     </span>
                   </span>
-                  <span className="filter-dropdown-label truncate">{option.name}</span>
+                  <span className="filter-dropdown-label truncate !text-black dark:!text-white">
+                    {option.name}
+                  </span>
                 </div>
-                <span className={cn("filter-dropdown-check", selected ? "opacity-100" : "opacity-0")}>
+                <span
+                  className={cn(
+                    "filter-dropdown-check text-black dark:text-white",
+                    selected ? "opacity-100" : "opacity-0",
+                  )}
+                >
                   <Check size={11} aria-hidden="true" />
                 </span>
               </button>
@@ -189,7 +209,10 @@ function LanguageMenu({
   );
 }
 
-export function LanguageToggle({ className, compact = false }: LanguageToggleProps) {
+export function LanguageToggle({
+  className,
+  compact = false,
+}: LanguageToggleProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [language, setLanguageState] = useState<LanguageCode>("en");
@@ -200,8 +223,10 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
   const { ripples, addRipple } = useGlassRipple();
 
   useEffect(() => {
-    setMounted(true);
-    setLanguageState(readStoredLanguage());
+    queueMicrotask(() => {
+      setMounted(true);
+      setLanguageState(readStoredLanguage());
+    });
 
     const handleLanguageChange = (event: Event) => {
       const next = (event as CustomEvent<LanguageCode>).detail;
@@ -217,7 +242,10 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
 
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (!menuRef.current?.contains(target) && !rootRef.current?.contains(target)) {
+      if (
+        !menuRef.current?.contains(target) &&
+        !rootRef.current?.contains(target)
+      ) {
         setOpen(false);
       }
     };
@@ -243,7 +271,10 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
 
       const rect = trigger.getBoundingClientRect();
       const MENU_WIDTH = 156;
-      const left = Math.max(8, Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8));
+      const left = Math.max(
+        8,
+        Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8),
+      );
       setMenuPosition({ left, top: rect.bottom + 8 });
     };
 
@@ -257,7 +288,9 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
   }, [open, compact]);
 
   const activeOption = useMemo(
-    () => LANGUAGE_OPTIONS.find((option) => option.code === language) ?? LANGUAGE_OPTIONS[0],
+    () =>
+      LANGUAGE_OPTIONS.find((option) => option.code === language) ??
+      LANGUAGE_OPTIONS[0],
     [language],
   );
 
@@ -275,17 +308,17 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
           addRipple(event);
           setOpen((current) => !current);
         }}
-        className={cn(
-          "glass-btn relative flex items-center overflow-hidden text-foreground/58 transition-colors duration-150 hover:text-foreground",
-          "h-8 gap-1.5 rounded-lg px-2.5",
-        )}
+        className="glass-btn relative flex h-8 items-center gap-1.5 overflow-hidden rounded-lg px-2.5 text-black dark:text-white [&_svg]:text-current"
         aria-label="Choose language"
         aria-haspopup="menu"
         aria-expanded={open}
       >
         <GlassRipples ripples={ripples} />
-        <Languages size={compact ? 12 : 13} className="relative z-[1]" />
-        <span className="relative z-[1] font-mono text-[9px] uppercase tracking-[1.2px]">
+        <Languages
+          size={compact ? 12 : 13}
+          className="relative z-[1] shrink-0"
+        />
+        <span className="relative z-[1] font-mono text-[9px] uppercase tracking-[1.2px] text-inherit">
           {activeOption.label}
         </span>
       </button>
@@ -300,7 +333,9 @@ export function LanguageToggle({ className, compact = false }: LanguageTogglePro
         />
       )}
 
-      {open && !compact && mounted &&
+      {open &&
+        !compact &&
+        mounted &&
         createPortal(
           <LanguageMenu
             menuRef={menuRef}

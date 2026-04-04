@@ -21,18 +21,23 @@ export function AnimatedThemeToggle({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY) as "light" | "dark" | null;
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial = stored ?? (prefersDark ? "dark" : "light");
-    setTheme(initial);
-    if (initial === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    queueMicrotask(() => {
+      setMounted(true);
+      const stored = localStorage.getItem(STORAGE_KEY) as
+        | "light"
+        | "dark"
+        | null;
+      const prefersDark =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const initial = stored ?? (prefersDark ? "dark" : "light");
+      setTheme(initial);
+      if (initial === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    });
   }, []);
 
   const toggle = () => {
@@ -52,7 +57,10 @@ export function AnimatedThemeToggle({
   if (!mounted) {
     return (
       <button
-        className={cn("size-8 flex items-center justify-center rounded-lg", className)}
+        className={cn(
+          "size-8 flex items-center justify-center rounded-lg text-black dark:text-white",
+          className,
+        )}
         aria-label="Theme toggle"
         disabled
       >
@@ -67,10 +75,17 @@ export function AnimatedThemeToggle({
         onClick?.(event);
         toggle();
       }}
-      className={cn("size-8 flex items-center justify-center rounded-lg cursor-pointer", className)}
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className={cn(
+        "size-8 flex cursor-pointer items-center justify-center rounded-lg text-black dark:text-white",
+        className,
+      )}
+      aria-label={
+        theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+      }
     >
-      <span className="relative z-[1] flex items-center justify-center text-current"><SolarSwitch isDark={theme === "dark"} /></span>
+      <span className="relative z-[1] flex items-center justify-center text-current">
+        <SolarSwitch isDark={theme === "dark"} />
+      </span>
     </button>
   );
 }

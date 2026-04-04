@@ -36,7 +36,7 @@ export function CalendarMonth({
       <div className="grid grid-cols-7 justify-items-center px-2 mb-0.5">
         {WEEKDAYS.map((d, i) => (
           <div key={i} className="h-6 flex items-center justify-center w-10">
-            <span className="font-mono text-[9px] font-medium text-muted-foreground/35 uppercase tracking-wider">
+            <span className="font-mono text-[9px] font-medium uppercase tracking-wider text-black dark:text-white">
               {d}
             </span>
           </div>
@@ -45,8 +45,10 @@ export function CalendarMonth({
 
       {/* Day grid */}
       <div className="grid grid-cols-7 justify-items-center px-2 gap-y-0.5">
-        {startCells.map(i => <div key={`s${i}`} className="w-10 h-10" />)}
-        {days.map(day => (
+        {startCells.map((i) => (
+          <div key={`s${i}`} className="w-10 h-10" />
+        ))}
+        {days.map((day) => (
           <DayCell
             key={day.date}
             day={day.day}
@@ -62,7 +64,9 @@ export function CalendarMonth({
             onClick={() => onDayClick(day)}
           />
         ))}
-        {endCells.map(i => <div key={`e${i}`} className="w-10 h-10" />)}
+        {endCells.map((i) => (
+          <div key={`e${i}`} className="w-10 h-10" />
+        ))}
       </div>
     </div>
   );
