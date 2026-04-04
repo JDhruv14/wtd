@@ -1,0 +1,26 @@
+# Next.js on Cloudflare Workers via @opennextjs/cloudflare
+# https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/
+# https://opennext.js.org/cloudflare/get-started
+
+# Must match the Worker name in the Cloudflare dashboard / deploy target
+name = "what-the-dhruv"
+main = ".open-next/worker.js"
+# Must be 2024-09-23 or later for @opennextjs/cloudflare
+compatibility_date = "2026-04-02"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# Optional: WORKER_SELF_REFERENCE only after the Worker exists and names match.
+# See https://developers.cloudflare.com/workers/configuration/bindings/about-service-bindings/
+
+# [[kv_namespaces]]
+# binding = "MY_KV"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
