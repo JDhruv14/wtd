@@ -46,7 +46,7 @@ export function LikeButton({
 
   // When initialCount rises (API data loaded) smoothly count up — but never decrease
   React.useEffect(() => {
-    setLikeCount(c => (initialCount > c ? initialCount : c));
+    setLikeCount((c) => (initialCount > c ? initialCount : c));
   }, [initialCount]);
 
   // On navigation (date changes): reset state immediately with no animation
@@ -59,7 +59,7 @@ export function LikeButton({
       setIsCelebrating(false);
       setMountDone(true); // skip entrance animation on navigation
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
   const handleTap = () => {
@@ -74,16 +74,16 @@ export function LikeButton({
       haptic([{ duration: 15 }], { intensity: 0.4 });
       onLikeChange?.(true, newCount, true);
       sileo.success({
-        title: "Archive saved",
-        description: "That one clearly landed. Thanks for the signal.",
-        position: "top-right",
-        duration: 3000,
-        icon: <Heart size={16} className="text-red-500" fill="currentColor" strokeWidth={0} />,
-        styles: {
-          title: "sileo-title",
-          description: "sileo-description",
-        },
-        roundness: 22,
+        title: "Love Alert",
+        description: "Thank you so much ⸜(｡˃ ᵕ ˂ )⸝♡",
+        icon: (
+          <Heart
+            size={16}
+            className="text-red-500"
+            fill="currentColor"
+            strokeWidth={0}
+          />
+        ),
       });
     } else {
       setFillLevel(nextFill);
@@ -103,7 +103,7 @@ export function LikeButton({
       aria-label={completed ? "Liked" : "Like"}
       className={cn(
         "flex items-center justify-center gap-1.5 pl-3 pr-3 py-2 rounded-lg group hover:bg-accent transition-colors cursor-pointer text-foreground",
-        className
+        className,
       )}
     >
       <div className="relative size-5 flex items-center justify-center shrink-0">
@@ -114,7 +114,12 @@ export function LikeButton({
             key="celebrate"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 10, delay: 0.3 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 10,
+              delay: 0.3,
+            }}
             onAnimationComplete={() => setIsCelebrating(false)}
             className="absolute inset-0 flex items-center justify-center"
           >
@@ -132,8 +137,12 @@ export function LikeButton({
             <motion.div
               key={date}
               className="absolute inset-0 overflow-hidden"
-              initial={{ clipPath: `inset(${100 - displayFillFraction * 100}% 0 0 0)` }}
-              animate={{ clipPath: `inset(${100 - displayFillFraction * 100}% 0 0 0)` }}
+              initial={{
+                clipPath: `inset(${100 - displayFillFraction * 100}% 0 0 0)`,
+              }}
+              animate={{
+                clipPath: `inset(${100 - displayFillFraction * 100}% 0 0 0)`,
+              }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <Heart

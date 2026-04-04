@@ -287,64 +287,64 @@ body {
 
 /* ── Mobile sidebar — glass surface ── */
 [data-mobile="true"][data-sidebar="sidebar"] {
-  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.04) !important;
-  backdrop-filter: url(#liquid-glass) blur(5px) saturate(1.65) brightness(1.03) !important;
-  background-color: rgba(246, 246, 244, 0.72) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(190%) brightness(1.04) !important;
+  backdrop-filter: url(#liquid-glass) blur(6px) saturate(1.65) brightness(1.03) !important;
+  background-color: rgba(252, 252, 250, 0.65) !important;
   border-radius: 0 22px 22px 0 !important;
   border-right: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.82),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88),
     inset -1.5px 0 0 rgba(255, 255, 255, 0.38),
-    6px 0 40px rgba(0, 0, 0, 0.12) !important;
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.16),
+    6px 0 36px rgba(0, 0, 0, 0.11) !important;
   clip-path: inset(0 0 0 0 round 0 22px 22px 0) !important;
   overflow: hidden;
 }
 .dark [data-mobile="true"][data-sidebar="sidebar"] {
-  -webkit-backdrop-filter: blur(28px) saturate(165%) brightness(1.14) !important;
-  backdrop-filter: url(#liquid-glass) blur(5px) saturate(1.45) brightness(1.10) !important;
-  background-color: rgba(16, 16, 15, 0.68) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(168%) brightness(1.12) !important;
+  backdrop-filter: url(#liquid-glass) blur(6px) saturate(1.5) brightness(1.08) !important;
+  background-color: rgba(18, 18, 17, 0.6) !important;
   border-radius: 0 22px 22px 0 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.09);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.10),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
     inset -1.5px 0 0 rgba(255, 255, 255, 0.05),
-    6px 0 40px rgba(0, 0, 0, 0.55) !important;
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05),
+    6px 0 40px rgba(0, 0, 0, 0.5) !important;
   clip-path: inset(0 0 0 0 round 0 22px 22px 0) !important;
   overflow: hidden;
 }
 
-/* ── Sidebar glass-btn — match the theme toggle / sidebar trigger visual in both modes ──
-   The standard glass-btn has a white border (invisible on light sidebar bg).
-   Override to use a subtle dark border so it looks identical to the header controls. */
+/* ── Sidebar glass-btn — no extra backdrop-filter (avoids muddy grey on frosted panel) */
 [data-slot="sidebar-inner"] .glass-btn {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  background: rgba(255, 255, 255, 0.60);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.07);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 3px rgba(0, 0, 0, 0.07);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 3px rgba(0, 0, 0, 0.06);
 }
 [data-slot="sidebar-inner"] .glass-btn:hover {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 2px 6px rgba(0, 0, 0, 0.09);
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .dark [data-slot="sidebar-inner"] .glass-btn {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  background: rgba(30, 30, 28, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(34, 34, 32, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    0 1px 3px rgba(0, 0, 0, 0.5);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.45);
 }
 .dark [data-slot="sidebar-inner"] .glass-btn:hover {
-  background: rgba(40, 40, 38, 0.75);
+  background: rgba(44, 44, 42, 0.88);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 2px 6px rgba(0, 0, 0, 0.55);
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* ── Mobile glass-btn — visible border in light mode ── */
@@ -414,16 +414,15 @@ body {
   --foreground: #000000;
   --muted-foreground: var(--foreground);
   color: var(--foreground);
-  -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.03);
-  backdrop-filter: url(#liquid-glass) blur(5px) saturate(1.65) brightness(1.02);
+  /* Frosted panel: blur stays on the shell; tint stays bright (not grey fog) */
+  background-color: rgba(252, 252, 250, 0.62) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(185%) brightness(1.04);
+  backdrop-filter: url(#liquid-glass) blur(6px) saturate(1.65) brightness(1.03);
   box-shadow:
-    /* top specular rim */
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.82),
-    /* right specular edge */
-    inset -1.5px 0 0 rgba(255, 255, 255, 0.38),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.15),
-    /* depth shadow */
-    4px 0 24px rgba(0, 0, 0, 0.10);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.88),
+    inset -1.5px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
+    5px 0 28px rgba(0, 0, 0, 0.09);
   transition:
     opacity 220ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 320ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -434,11 +433,14 @@ body {
 .dark [data-slot="sidebar-inner"] {
   --foreground: #ffffff;
   --muted-foreground: var(--foreground);
+  background-color: rgba(18, 18, 17, 0.58) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(165%) brightness(1.1);
+  backdrop-filter: url(#liquid-glass) blur(6px) saturate(1.48) brightness(1.08);
   box-shadow:
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.10),
-    inset -1.5px 0 0 rgba(255, 255, 255, 0.05),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04),
-    4px 0 24px rgba(0, 0, 0, 0.40);
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
+    inset -1.5px 0 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.05),
+    5px 0 32px rgba(0, 0, 0, 0.42);
 }
 .group[data-state="collapsed"] [data-slot="sidebar-inner"] {
   opacity: 0;
@@ -611,6 +613,8 @@ body {
   flex-direction: column;
   gap: 0.18rem;
   padding: 0.08rem;
+  /* Reserve height for optional native share row so the panel doesn’t jump when it mounts */
+  min-height: 7.25rem;
 }
 
 .share-dropdown-row {
@@ -873,52 +877,6 @@ body {
   }
 }
 
-[data-sileo-toast] {
-  --sileo-width: 320px;
-}
-
-[data-sileo-toast] svg {
-  flex-shrink: 0;
-}
-
-[data-sileo-toast] [data-sileo-description] {
-  border-radius: 22px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
-  background: color-mix(in srgb, var(--background) 86%, transparent);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 10px 28px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
-}
-
-.dark [data-sileo-toast] [data-sileo-description] {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 14px 32px rgba(0, 0, 0, 0.34);
-}
-
-.sileo-title {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 1.3px;
-  text-transform: uppercase;
-}
-
-.sileo-description {
-  font-family: var(--font-sans), ui-sans-serif, sans-serif;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--foreground) !important;
-}
-
-.sileo-button {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
-
 .tiptap-content h1,
 .tiptap-content h2,
 .tiptap-content h3 {
@@ -975,11 +933,21 @@ body {
 /* ── Duration utilities ── */
 .duration-250 { transition-duration: 250ms; }
 
-/* ── Sileo toast: center relative to content area (not full viewport) ── */
-/* --toast-center-offset is set by AppSidebar: sidebar-width/2 when expanded, 0 when closed */
+/* ── Sileo toast: shift center viewport with main column (sidebar). Only touch `left`; keep Sileo’s own motion on the toast. */
+/* --toast-center-offset: AppSidebar — mobile 0; desktop expanded 160px (320px/2); desktop collapsed 1.5rem (icon rail/2) */
 [data-sileo-viewport][data-position$="center"] {
   left: calc(50% + var(--toast-center-offset, 0px)) !important;
-  transition: left 340ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-property: left;
+  transition-duration: 340ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Center title + description copy (top-center: title pill above message — Sileo’s fixed order). */
+[data-sileo-toast] [data-sileo-description] {
+  text-align: center;
+}
+[data-sileo-toast] [data-sileo-header-inner] {
+  justify-content: center;
 }
 
 /* ── Glass ripple (scatter effect on click) ── */

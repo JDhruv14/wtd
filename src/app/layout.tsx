@@ -5,8 +5,8 @@ import {
   Instrument_Serif,
   Manrope,
 } from "next/font/google";
-import { Toaster } from "sileo";
 import { RootShell } from "@/components/root-shell";
+import { SileoToaster } from "@/components/sileo-toaster";
 import { getStableSiteData } from "@/lib/site-data";
 import "@/app/globals.css";
 
@@ -153,19 +153,7 @@ export default function RootLayout({
             </filter>
           </defs>
         </svg>
-        <Toaster
-          position="top-right"
-          theme="system"
-          offset={{ top: 16, right: 16, left: 16 }}
-          options={{
-            roundness: 22,
-            styles: {
-              title: "sileo-title",
-              description: "sileo-description",
-              button: "sileo-button",
-            },
-          }}
-        />
+        <SileoToaster />
         <RootShell
           monthsData={monthsData}
           allEntryDates={allEntryDates}

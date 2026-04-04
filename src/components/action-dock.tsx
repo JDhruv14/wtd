@@ -195,19 +195,46 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
       const btn = shareTriggerRef.current;
       if (!btn) return;
       const rect = btn.getBoundingClientRect();
+      // Anchor menu bottom edge just above the trigger (stable when rows mount later).
       setShareMenuPos({
         right: window.innerWidth - rect.right,
         bottom: window.innerHeight - rect.top + 8,
       });
     };
     updatePos();
+
+    // Sidebar / dock animates ~300ms — re-sample so the menu tracks the moving trigger.
+    let frame = 0;
+    let rafId = 0;
+    let cancelled = false;
+    const maxFrames = 26;
+    const tick = () => {
+      if (cancelled) return;
+      updatePos();
+      frame++;
+      if (frame < maxFrames) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            queueMicrotask(updatePos);
+          })
+        : null;
+    if (ro && shareTriggerRef.current) {
+      ro.observe(shareTriggerRef.current);
+    }
     window.addEventListener("resize", updatePos);
     window.addEventListener("scroll", updatePos, true);
     return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      ro?.disconnect();
       window.removeEventListener("resize", updatePos);
       window.removeEventListener("scroll", updatePos, true);
     };
-  }, [shareOpen]);
+  }, [shareOpen, sidebarState, isMobile, openMobile, shareFeedback]);
 
   if (!entry) return null;
 

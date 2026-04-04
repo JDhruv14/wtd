@@ -224,11 +224,11 @@ export function EntryView({
         {!isMobile && <DesktopUtilityRail />}
         <div className="flex-1 flex items-center justify-center">
           <div
-            className="text-center max-w-sm px-6 entry-reveal flex flex-col items-center"
+            className="text-center w-full px-4 sm:px-6 entry-reveal flex flex-col items-center"
             style={{ "--delay": "0ms" } as React.CSSProperties}
           >
             <BearSvg className="w-28 h-28 text-muted-foreground dark:text-white mb-5 opacity-60" />
-            <p className="font-sans text-[16px] text-muted-foreground/70 mb-8 leading-relaxed">
+            <p className="font-sans text-[15px] sm:text-[16px] text-muted-foreground/70 mb-8 max-w-[min(100%,15rem)] sm:max-w-sm leading-relaxed">
               Sorry, I still haven&apos;t written anything yet or don&apos;t
               feel like writing today
             </p>

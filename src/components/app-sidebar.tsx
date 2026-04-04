@@ -133,19 +133,32 @@ export function AppSidebar({
     return () => observer.disconnect();
   }, []);
 
+  /** Delay signature animation 0.2s after sidebar opens so the stroke doesn’t appear ahead of the replay. */
+  const [penflowReady, setPenflowReady] = useState(false);
+
   useEffect(() => {
-    queueMicrotask(() => {
-      if (!isOpen) {
+    if (!isOpen) {
+      queueMicrotask(() => {
         setPenflowAnimate(false);
-        return;
-      }
-      setPenflowPlayheadKey((k) => k + 1);
-      setPenflowAnimate(true);
+        setPenflowReady(false);
+      });
+      return;
+    }
+    queueMicrotask(() => {
+      setPenflowReady(false);
     });
+    const id = window.setTimeout(() => {
+      queueMicrotask(() => {
+        setPenflowPlayheadKey((k) => k + 1);
+        setPenflowAnimate(true);
+        setPenflowReady(true);
+      });
+    }, 200);
+    return () => clearTimeout(id);
   }, [isOpen]);
 
   useLayoutEffect(() => {
-    const offset = !isMobile && state === "expanded" ? "160px" : "0px";
+    const offset = isMobile ? "0px" : state === "expanded" ? "160px" : "1.5rem";
     document.documentElement.style.setProperty("--toast-center-offset", offset);
   }, [isMobile, state]);
 
@@ -877,20 +890,32 @@ export function AppSidebar({
         </div>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/10 px-4 pb-2 pt-2.5 flex flex-col gap-2 shrink-0 rounded-none dark:border-white/[0.07]">
-        <div className="flex items-center justify-between">
-          <Penflow
-            key={penflowColor}
-            text="Dhruv Jaradi"
-            fontUrl="/fonts/BrittanySignature.ttf"
-            quality="balanced"
-            size={19}
-            color={penflowColor}
-            className="-translate-y-[3px] opacity-80"
-            animate={penflowAnimate}
-            playheadKey={penflowPlayheadKey}
-          />
-          <span className="select-none font-mono text-[9px] uppercase tracking-[1.5px] text-black dark:text-white">
+      <SidebarFooter
+        className="box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] shrink-0 flex-col justify-center overflow-hidden rounded-none border-t border-white/10 px-4 py-2.5 notranslate dark:border-white/[0.07]"
+        translate="no"
+      >
+        {/* Fixed row height + overflow so Penflow never changes footer size */}
+        <div className="grid h-8 w-full shrink-0 grid-cols-[minmax(0,1fr)_3rem] items-center gap-x-2">
+          <div className="flex h-full min-h-0 min-w-0 items-center overflow-hidden">
+            {isOpen && !penflowReady ? (
+              <div className="h-[26px] w-[120px] shrink-0" aria-hidden />
+            ) : (
+              <div className="flex h-full w-full min-w-0 max-h-8 items-center [&_canvas]:max-h-8">
+                <Penflow
+                  key={penflowColor}
+                  text="Dhruv Jaradi"
+                  fontUrl="/fonts/BrittanySignature.ttf"
+                  quality="balanced"
+                  size={19}
+                  color={penflowColor}
+                  className="-translate-y-px opacity-80"
+                  animate={Boolean(isOpen && penflowReady && penflowAnimate)}
+                  playheadKey={penflowPlayheadKey}
+                />
+              </div>
+            )}
+          </div>
+          <span className="pointer-events-none shrink-0 select-none text-right tabular-nums font-mono text-[9px] uppercase tracking-[1.5px] text-black dark:text-white">
             {new Date().getFullYear()}
           </span>
         </div>
