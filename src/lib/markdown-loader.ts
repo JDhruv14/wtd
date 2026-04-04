@@ -1,20 +1,6 @@
-import fs from "fs";
-import path from "path";
 import type { Entry, DayData, MonthData } from "./types";
 import { GENRE_MAP, getTopicColor } from "./topics";
-
-/** Resolve `content/` — cwd differs on Cloudflare Workers / OpenNext vs local dev. */
-function getContentDir(): string {
-  const candidates = [
-    path.join(process.cwd(), "content"),
-    path.join(process.cwd(), "..", "content"),
-    path.join(process.cwd(), "..", "..", "content"),
-  ];
-  for (const dir of candidates) {
-    if (fs.existsSync(dir)) return dir;
-  }
-  return path.join(process.cwd(), "content");
-}
+import contentIndex from "./content-index.json";
 
 const MONTH_ABBR: Record<number, string> = {
   1: "JAN",
@@ -101,31 +87,9 @@ function inferIconName(url: string, genre: string | undefined): string {
   return "sparkle";
 }
 
-/** Recursively collect all YYYY-MM-DD.md file paths under CONTENT_DIR. */
-function collectMdFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const files: string[] = [];
-
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...collectMdFiles(full));
-    } else if (entry.isFile() && /^\d{4}-\d{2}-\d{2}\.md$/.test(entry.name)) {
-      files.push(full);
-    }
-  }
-
-  return files.sort();
-}
-
 export function loadMdEntries(): Entry[] {
-  try {
-    const files = collectMdFiles(getContentDir());
-
-    return files.map((filePath, idx) => {
-      const date = path.basename(filePath).slice(0, 10);
-      const raw = fs.readFileSync(filePath, "utf-8");
+  return (contentIndex as { date: string; raw: string }[]).map(
+    ({ date, raw }, idx) => {
       const { meta, body } = parseFrontmatter(raw);
       const mediaUrl = meta.url ?? meta.media_url ?? "";
       const mediaType =
@@ -152,10 +116,8 @@ export function loadMdEntries(): Entry[] {
         like_count: Number(meta.like_count ?? 0),
         initialMetadata: null,
       } as Entry;
-    });
-  } catch {
-    return [];
-  }
+    },
+  );
 }
 
 export function buildMergedMonthsData(
@@ -166,7 +128,6 @@ export function buildMergedMonthsData(
 
   const monthKeys = new Set<string>();
 
-  // Ensure calendar always shows continuous months from April 2026 up to the end of the year.
   const startYear = 2026;
   const startMonth = 4; // April
 
@@ -174,14 +135,13 @@ export function buildMergedMonthsData(
 
   for (let year = startYear; year <= currentYear; year++) {
     const minMonth = year === startYear ? startMonth : 1;
-    const maxMonth = 12; // Show the full year natively without needing external data
+    const maxMonth = 12;
     for (let month = minMonth; month <= maxMonth; month++) {
       const monthStr = String(month).padStart(2, "0");
       monthKeys.add(`${year}-${monthStr}`);
     }
   }
 
-  // Also include any months that might have entries outside of this range
   for (const e of allEntries) {
     monthKeys.add(e.date.slice(0, 7));
   }

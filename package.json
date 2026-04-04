@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "opennextjs-cloudflare build",
+    "dev": "node scripts/generate-content-index.mjs && next dev",
+    "build": "node scripts/generate-content-index.mjs && opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare deploy",
     "lint": "eslint .",
