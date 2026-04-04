@@ -72,7 +72,7 @@ function MobileHeader() {
             <GlassRipples ripples={githubRipples} />
             <Github size={14} className="relative z-[1]" />
           </a>
-          <span className="pointer-events-none absolute right-0 top-0 z-[3] translate-x-[35%] -translate-y-[35%]">
+          <span className="pointer-events-none absolute right-0 top-1 z-[3] translate-x-[35%] -translate-y-[20%]">
             <Star
               size={11}
               className="animate-bounce text-yellow-400 dark:text-yellow-500"

@@ -97,7 +97,7 @@ function DesktopUtilityRail() {
             <GlassRipples ripples={githubRipples} />
             <Github size={14} className="relative z-[1]" />
           </a>
-          <span className="pointer-events-none absolute right-0 top-0 z-[3] translate-x-[35%] -translate-y-[35%]">
+          <span className="pointer-events-none absolute right-0 top-1 z-[3] translate-x-[35%] -translate-y-[20%]">
             <Star
               size={11}
               className="animate-bounce text-yellow-400 dark:text-yellow-500"
@@ -115,6 +115,15 @@ function DesktopUtilityRail() {
         </div>
       </div>
     </>
+  );
+}
+
+/** CSS-gated so desktop chrome never paints on small viewports during the first client frame (isMobile starts false). */
+function DesktopRailSlot() {
+  return (
+    <div className="hidden md:block">
+      <DesktopUtilityRail />
+    </div>
   );
 }
 
@@ -184,7 +193,7 @@ export function EntryView({
       <div
         className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full"}`}
       >
-        {!isMobile && <DesktopUtilityRail />}
+        <DesktopRailSlot />
         <div
           className={`w-full max-w-[980px] self-center px-6 md:px-10 pb-32 ${isMobile ? "pt-6" : "pt-24"}`}
         >
@@ -206,7 +215,7 @@ export function EntryView({
   if (!entry) {
     return (
       <div className="flex-1 h-full flex flex-col bg-background">
-        {!isMobile && <DesktopUtilityRail />}
+        <DesktopRailSlot />
         <div className="flex-1 flex items-center justify-center px-6">
           <p className="font-mono text-[13px] text-muted-foreground uppercase tracking-premium">
             Select a date to open the archive
@@ -221,7 +230,7 @@ export function EntryView({
       <div
         className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full py-12"}`}
       >
-        {!isMobile && <DesktopUtilityRail />}
+        <DesktopRailSlot />
         <div className="flex-1 flex items-center justify-center">
           <div
             className="text-center w-full px-4 sm:px-6 entry-reveal flex flex-col items-center"
@@ -286,7 +295,7 @@ export function EntryView({
         className="absolute inset-x-0 top-0 h-[420px] pointer-events-none transition-[background] duration-700 ease-in-out"
       />
 
-      {!isMobile && <DesktopUtilityRail />}
+      <DesktopRailSlot />
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.div

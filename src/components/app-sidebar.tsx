@@ -133,7 +133,7 @@ export function AppSidebar({
     return () => observer.disconnect();
   }, []);
 
-  /** Delay signature animation 0.2s after sidebar opens so the stroke doesn’t appear ahead of the replay. */
+  /** Delay signature animation 0.5s after sidebar opens so the stroke doesn’t appear ahead of the replay. */
   const [penflowReady, setPenflowReady] = useState(false);
 
   useEffect(() => {
@@ -153,7 +153,7 @@ export function AppSidebar({
         setPenflowAnimate(true);
         setPenflowReady(true);
       });
-    }, 200);
+    }, 50);
     return () => clearTimeout(id);
   }, [isOpen]);
 
@@ -902,7 +902,6 @@ export function AppSidebar({
             ) : (
               <div className="flex h-full w-full min-w-0 max-h-8 items-center [&_canvas]:max-h-8">
                 <Penflow
-                  key={penflowColor}
                   text="Dhruv Jaradi"
                   fontUrl="/fonts/BrittanySignature.ttf"
                   quality="balanced"

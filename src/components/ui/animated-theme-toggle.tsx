@@ -1,13 +1,28 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useLayoutEffect, useSyncExternalStore } from "react";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useWebHaptics } from "web-haptics/react";
 
-import { Button } from "./button";
-
 const STORAGE_KEY = "btw-theme";
+
+function subscribeHtmlClass(callback: () => void) {
+  const el = document.documentElement;
+  const obs = new MutationObserver(() => {
+    queueMicrotask(callback);
+  });
+  obs.observe(el, { attributes: true, attributeFilter: ["class"] });
+  return () => obs.disconnect();
+}
+
+function getThemeSnapshot(): "light" | "dark" {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+
+function getServerThemeSnapshot(): "light" | "dark" {
+  return "dark";
+}
 
 export function AnimatedThemeToggle({
   className,
@@ -17,60 +32,27 @@ export function AnimatedThemeToggle({
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   const { trigger: haptic } = useWebHaptics();
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      setMounted(true);
-      const stored = localStorage.getItem(STORAGE_KEY) as
-        | "light"
-        | "dark"
-        | null;
-      const prefersDark =
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const initial = stored ?? (prefersDark ? "dark" : "light");
-      setTheme(initial);
-      if (initial === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    });
-  }, []);
+  const theme = useSyncExternalStore(
+    subscribeHtmlClass,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
 
   const toggle = () => {
     haptic([{ duration: 15 }], { intensity: 0.4 });
     const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, next);
-      if (next === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    localStorage.setItem(STORAGE_KEY, next);
+    if (next === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   };
 
-  if (!mounted) {
-    return (
-      <button
-        className={cn(
-          "size-8 flex items-center justify-center rounded-lg text-black dark:text-white",
-          className,
-        )}
-        aria-label="Theme toggle"
-        disabled
-      >
-        <span className="size-5" />
-      </button>
-    );
-  }
-
   return (
     <button
+      type="button"
+      suppressHydrationWarning
       onClick={(event) => {
         onClick?.(event);
         toggle();
@@ -83,7 +65,10 @@ export function AnimatedThemeToggle({
         theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
       }
     >
-      <span className="relative z-[1] flex items-center justify-center text-current">
+      <span
+        className="relative z-[1] flex items-center justify-center text-current"
+        suppressHydrationWarning
+      >
         <SolarSwitch isDark={theme === "dark"} />
       </span>
     </button>
@@ -107,6 +92,16 @@ function SolarSwitch({ isDark }: { isDark: boolean }) {
   const scaleSun = useMotionValue(isDark ? 0 : 1);
   const pathLengthMoon = useTransform(scaleMoon, [0.6, 1], [0, 1]);
   const pathLengthSun = useTransform(scaleSun, [0.6, 1], [0, 1]);
+
+  useLayoutEffect(() => {
+    const tm = isDark ? 1 : 0;
+    const ts = isDark ? 0 : 1;
+    const skipMotion =
+      Math.abs(scaleMoon.get() - tm) < 0.02 &&
+      Math.abs(scaleSun.get() - ts) < 0.02;
+    animate(scaleMoon, tm, { duration: skipMotion ? 0 : duration });
+    animate(scaleSun, ts, { duration: skipMotion ? 0 : duration });
+  }, [duration, isDark, scaleMoon, scaleSun]);
 
   return (
     <motion.div animate={isDark ? "checked" : "unchecked"} initial={false}>
