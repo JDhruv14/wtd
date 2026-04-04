@@ -112,11 +112,11 @@ function LinkPreviewCard({
       }
     };
 
-    const img = new Image();
+    const img = document.createElement("img");
     img.crossOrigin = "anonymous";
     img.onload = () => extractColor(img);
     img.onerror = () => {
-      const fallback = new Image();
+      const fallback = document.createElement("img");
       fallback.onload = () => extractColor(fallback);
       fallback.src = metadata.image || "";
     };

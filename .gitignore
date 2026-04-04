@@ -16,7 +16,9 @@
 .agent
 .agents
 .claude
-CLAUDE.md
+.CLAUDE.md
+.AGENTS.md
+.skills-lock.json
 
 # opennextjs-cloudflare
 .open-nextjs-cloudflare
