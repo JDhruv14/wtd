@@ -35,7 +35,8 @@ import {
   TOPICS,
 } from "@/lib/topics";
 import { cn } from "@/lib/utils";
-import { socialLinks } from "@/../content/sidebar/profile";
+import { favouritesSection } from "@content/sidebar/favourites";
+import { socialLinks } from "@content/sidebar/profile";
 
 const Penflow = dynamic(() => import("penflow/react").then((m) => m.Penflow), {
   ssr: false,
@@ -346,7 +347,12 @@ export function AppSidebar({
                     trigger([{ duration: 15 }], { intensity: 0.4 });
                     onAboutClick();
                   }}
-                  className="glass-btn relative h-8 overflow-hidden rounded-lg px-2.5 font-mono text-[10px] font-medium tracking-[1.2px] text-foreground/50 transition-colors duration-150 hover:text-foreground"
+                  className={cn(
+                    "glass-btn relative h-8 overflow-hidden rounded-lg px-2.5 font-mono text-[10px] font-medium tracking-[1.2px] transition-colors duration-150",
+                    isMobile
+                      ? "text-black dark:text-white"
+                      : "text-foreground/50 hover:text-foreground",
+                  )}
                   aria-label="Show about view"
                 >
                   <GlassRipples ripples={aboutRipples} />
@@ -358,9 +364,11 @@ export function AppSidebar({
                     onClick={() => setTopicMenuOpen((open) => !open)}
                     className={cn(
                       "glass-btn flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-mono text-[10px] font-medium tracking-[1.2px] transition-colors duration-150",
-                      topicMenuOpen || selectedTopics.length > 0
-                        ? "text-foreground"
-                        : "text-foreground/50 hover:text-foreground",
+                      isMobile
+                        ? "text-black dark:text-white"
+                        : topicMenuOpen || selectedTopics.length > 0
+                          ? "text-foreground"
+                          : "text-foreground/50 hover:text-foreground",
                     )}
                     style={
                       activeFilterColor
@@ -377,9 +385,11 @@ export function AppSidebar({
                       size={10}
                       className={cn(
                         "shrink-0",
-                        topicMenuOpen || selectedTopics.length > 0
-                          ? "text-foreground"
-                          : "text-foreground/50",
+                        isMobile
+                          ? "text-black dark:text-white"
+                          : topicMenuOpen || selectedTopics.length > 0
+                            ? "text-foreground"
+                            : "text-foreground/50",
                       )}
                       aria-hidden="true"
                     />
@@ -393,9 +403,11 @@ export function AppSidebar({
                       size={11}
                       className={cn(
                         "shrink-0 transition-transform duration-150",
-                        topicMenuOpen || selectedTopics.length > 0
-                          ? "text-foreground"
-                          : "text-foreground/50",
+                        isMobile
+                          ? "text-black dark:text-white"
+                          : topicMenuOpen || selectedTopics.length > 0
+                            ? "text-foreground"
+                            : "text-foreground/50",
                         topicMenuOpen && "rotate-180",
                       )}
                       aria-hidden="true"
@@ -756,7 +768,7 @@ export function AppSidebar({
           <div className="flex-1 overflow-y-auto px-3 pb-3">
             <div className="mb-2 flex items-center px-1.5">
               <span className="select-none font-mono text-[8.5px] uppercase tracking-[1.8px] text-black dark:text-white">
-                {"\u2661"} My favourites
+                {favouritesSection.icon} {favouritesSection.label}
               </span>
             </div>
 

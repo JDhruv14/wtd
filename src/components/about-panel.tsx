@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { aboutParagraphs } from "@/../content/sidebar/about";
+import { aboutParagraphs } from "@content/sidebar/about";
 
 interface AboutPanelProps {
   isVisible: boolean;

@@ -16,7 +16,7 @@ import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { PageTranslator } from "@/components/ui/page-language";
 import { cn } from "@/lib/utils";
 import type { DayData, Entry, MonthData } from "@/lib/types";
-import { socialLinks } from "@/../content/sidebar/profile";
+import { socialLinks } from "@content/sidebar/profile";
 
 const GITHUB_LINK = socialLinks.github.href;
 

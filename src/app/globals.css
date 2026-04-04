@@ -5,20 +5,21 @@
 :root {
   --reading-font-size: 16px;
   --background: #f8f8f6;
-  --foreground: #0a0a0a;
+  /* Binary text: pure black in light mode (no grey type) */
+  --foreground: #000000;
   --border: rgba(0, 0, 0, 0.07);
   --input: rgba(0, 0, 0, 0.07);
   --ring: rgba(0, 0, 0, 0.18);
-  --primary: #0a0a0a;
+  --primary: #000000;
   --primary-foreground: #fafafa;
   --accent: rgba(0, 0, 0, 0.05);
-  --accent-foreground: #0a0a0a;
+  --accent-foreground: #000000;
   --destructive: #dc2626;
   --destructive-foreground: #fafafa;
   --secondary: rgba(0, 0, 0, 0.05);
-  --secondary-foreground: #0a0a0a;
+  --secondary-foreground: #000000;
   --muted: rgba(0, 0, 0, 0.035);
-  --muted-foreground: #5a5a5a;
+  --muted-foreground: var(--foreground);
   /* Sidebar — semi-transparent for liquid glass to show through */
   --sidebar: rgba(245, 245, 243, 0.52);
   --sidebar-foreground: var(--foreground);
@@ -29,26 +30,27 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
   /* Penflow signature in sidebar footer — canvas reads via var() */
-  --sidebar-penflow-signature: #1a1a18;
+  --sidebar-penflow-signature: #000000;
 }
 
 /* ── Dark theme ── */
 .dark {
   --background: #111110;
-  --foreground: #f2f2f0;
+  /* Pure white in dark mode */
+  --foreground: #ffffff;
   --border: rgba(255, 255, 255, 0.085);
   --input: rgba(255, 255, 255, 0.085);
   --ring: rgba(255, 255, 255, 0.25);
-  --primary: #f2f2f0;
+  --primary: #ffffff;
   --primary-foreground: #111110;
   --accent: rgba(255, 255, 255, 0.055);
-  --accent-foreground: #f2f2f0;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
   --secondary: rgba(255, 255, 255, 0.065);
-  --secondary-foreground: #f2f2f0;
+  --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.045);
-  --muted-foreground: #999;
+  --muted-foreground: var(--foreground);
   --sidebar: rgba(15, 15, 14, 0.52);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -94,14 +96,14 @@ body {
   color: var(--foreground);
   text-decoration: underline;
   text-underline-offset: 4px;
-  text-decoration-color: rgba(0,0,0,0.28);
+  text-decoration-color: var(--foreground);
   transition: text-decoration-color 0.15s;
 }
-.tiptap-content a:hover { text-decoration-color: rgba(0,0,0,0.65); }
-.dark .tiptap-content a { text-decoration-color: rgba(255,255,255,0.28); }
-.dark .tiptap-content a:hover { text-decoration-color: rgba(255,255,255,0.65); }
+.tiptap-content a:hover { text-decoration-color: var(--foreground); }
+.dark .tiptap-content a { text-decoration-color: var(--foreground); }
+.dark .tiptap-content a:hover { text-decoration-color: var(--foreground); }
 .tiptap-content strong { font-weight: 700; }
-.tiptap-content em { opacity: 0.86; }
+.tiptap-content em { opacity: 1; }
 .tiptap-content blockquote {
   margin: 1.5rem 0;
   border-left: 2px solid var(--border);
@@ -252,11 +254,11 @@ body {
 }
 
 .frosted-field {
-  color: color-mix(in srgb, var(--foreground) 92%, transparent);
+  color: var(--foreground);
 }
 
 .frosted-field::placeholder {
-  color: color-mix(in srgb, var(--muted-foreground) 74%, transparent);
+  color: var(--foreground);
 }
 
 .frosted-surface {
@@ -409,8 +411,8 @@ body {
 [data-slot="sidebar-inner"] {
   border-radius: 0 22px 22px 0 !important;
   clip-path: inset(0 0 0 0 round 0 22px 22px 0) !important;
-  --foreground: #0a0a0a;
-  --muted-foreground: #5a5a5a;
+  --foreground: #000000;
+  --muted-foreground: var(--foreground);
   color: var(--foreground);
   -webkit-backdrop-filter: blur(28px) saturate(190%) brightness(1.03);
   backdrop-filter: url(#liquid-glass) blur(5px) saturate(1.65) brightness(1.02);
@@ -430,8 +432,8 @@ body {
   transform-origin: left center;
 }
 .dark [data-slot="sidebar-inner"] {
-  --foreground: #f2f2f0;
-  --muted-foreground: #b7b7b2;
+  --foreground: #ffffff;
+  --muted-foreground: var(--foreground);
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.10),
     inset -1.5px 0 0 rgba(255, 255, 255, 0.05),
@@ -453,36 +455,6 @@ body {
   clip-path: inset(0 0 0 0 round 0 0 0 0) !important;
 }
 
-[data-slot="sidebar-inner"] .text-foreground\/45 {
-  color: rgb(from var(--foreground) r g b / 0.74) !important;
-}
-
-[data-slot="sidebar-inner"] .text-foreground\/50,
-[data-slot="sidebar-inner"] .text-foreground\/55 {
-  color: rgb(from var(--foreground) r g b / 0.82) !important;
-}
-
-[data-slot="sidebar-inner"] .text-foreground\/60 {
-  color: rgb(from var(--foreground) r g b / 0.9) !important;
-}
-
-[data-slot="sidebar-inner"] .text-muted-foreground\/28 {
-  color: rgb(from var(--muted-foreground) r g b / 0.46) !important;
-}
-
-[data-slot="sidebar-inner"] .text-muted-foreground\/30,
-[data-slot="sidebar-inner"] .text-muted-foreground\/35 {
-  color: rgb(from var(--muted-foreground) r g b / 0.56) !important;
-}
-
-[data-slot="sidebar-inner"] .text-muted-foreground\/45 {
-  color: rgb(from var(--muted-foreground) r g b / 0.7) !important;
-}
-
-[data-slot="sidebar-inner"] .text-muted-foreground\/55 {
-  color: rgb(from var(--muted-foreground) r g b / 0.82) !important;
-}
-
 .sidebar-meta-item {
   display: flex;
   min-width: 0;
@@ -496,7 +468,7 @@ body {
   font-size: 9px;
   letter-spacing: 1.4px;
   text-transform: none;
-  color: color-mix(in srgb, var(--muted-foreground) 58%, transparent);
+  color: var(--foreground);
 }
 
 .sidebar-meta-value {
@@ -504,7 +476,7 @@ body {
   font-size: 14px;
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 90%, transparent);
+  color: var(--foreground);
 }
 
 .sidebar-meta-divider {
@@ -525,7 +497,7 @@ body {
   font-size: 9px;
   letter-spacing: 1.15px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 44%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 1.5%, transparent);
   transition:
     color 150ms ease-out,
@@ -535,14 +507,14 @@ body {
 }
 
 .sidebar-filter-pill:hover {
-  color: color-mix(in srgb, var(--foreground) 82%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
 }
 
 .sidebar-filter-pill-active {
-  color: color-mix(in srgb, var(--foreground) 92%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 6%, transparent);
-  border-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+  border-color: var(--foreground);
 }
 
 .sidebar-entry-row {
@@ -587,7 +559,7 @@ body {
   font-size: 9px;
   letter-spacing: 1.4px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--muted-foreground) 62%, transparent);
+  color: var(--foreground);
 }
 
 .entry-info-chip-value {
@@ -595,7 +567,7 @@ body {
   font-size: 10px;
   letter-spacing: 1.1px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 84%, transparent);
+  color: var(--foreground);
 }
 
 .entry-keyword-pill {
@@ -608,7 +580,7 @@ body {
   font-size: 9px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 58%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 1.8%, transparent);
 }
 
@@ -626,7 +598,7 @@ body {
   font-size: 10px;
   letter-spacing: 1.4px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  color: var(--foreground);
   backdrop-filter: blur(18px) saturate(155%);
   -webkit-backdrop-filter: blur(18px) saturate(155%);
   box-shadow:
@@ -653,7 +625,7 @@ body {
   font-size: 9px;
   letter-spacing: 1.05px;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--foreground) 76%, transparent);
+  color: var(--foreground);
   background: transparent;
   transition:
     background 160ms ease,
@@ -662,9 +634,9 @@ body {
 }
 
 .share-dropdown-row:hover {
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-  border-color: color-mix(in srgb, var(--foreground) 7.5%, transparent);
-  color: color-mix(in srgb, var(--foreground) 92%, transparent);
+  background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
+  border-color: color-mix(in srgb, var(--foreground) 9%, transparent);
+  color: var(--foreground);
 }
 
 .share-menu-backdrop {
@@ -937,7 +909,7 @@ body {
   font-family: var(--font-sans), ui-sans-serif, sans-serif;
   font-size: 13px;
   line-height: 1.55;
-  color: color-mix(in srgb, var(--foreground) 74%, transparent) !important;
+  color: var(--foreground) !important;
 }
 
 .sileo-button {
@@ -1058,7 +1030,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
 }
 
 .dropdown-option:hover {
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
   border-color: color-mix(in srgb, var(--foreground) 9%, transparent);
 }
 
@@ -1088,7 +1060,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
   font-size: 7.4px;
   letter-spacing: 0.3px;
   text-transform: none;
-  color: color-mix(in srgb, var(--foreground) 62%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 4%, transparent);
   border: 1px solid color-mix(in srgb, var(--foreground) 7%, transparent);
   transition:
@@ -1098,9 +1070,9 @@ html:not(.dark) .dropdown-panel.glass-dock {
 }
 
 .filter-dropdown-clear:hover {
-  color: color-mix(in srgb, var(--foreground) 90%, transparent);
-  background: color-mix(in srgb, var(--foreground) 6%, transparent);
-  border-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  border-color: color-mix(in srgb, var(--foreground) 11%, transparent);
 }
 
 .filter-dropdown-list {
@@ -1131,8 +1103,8 @@ html:not(.dark) .dropdown-panel.glass-dock {
 }
 
 .filter-dropdown-row:hover {
-  background: color-mix(in srgb, var(--foreground) 4%, transparent);
-  border-color: color-mix(in srgb, var(--foreground) 7.5%, transparent);
+  background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
+  border-color: color-mix(in srgb, var(--foreground) 9%, transparent);
 }
 
 .filter-dropdown-row.is-selected {
@@ -1159,7 +1131,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
 }
 
 .filter-dropdown-all-icon {
-  color: color-mix(in srgb, var(--foreground) 54%, transparent);
+  color: var(--foreground);
 }
 
 .filter-dropdown-label {
@@ -1168,7 +1140,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
   font-size: 10.2px;
   letter-spacing: 0.3px;
   text-transform: none;
-  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+  color: var(--foreground);
 }
 
 .filter-dropdown-trailing {
@@ -1188,7 +1160,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 7.4px;
   letter-spacing: 0.72px;
-  color: color-mix(in srgb, var(--foreground) 60%, transparent);
+  color: var(--foreground);
   background: color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
@@ -1198,7 +1170,7 @@ html:not(.dark) .dropdown-panel.glass-dock {
   width: 0.9rem;
   align-items: center;
   justify-content: center;
-  color: color-mix(in srgb, var(--foreground) 72%, transparent);
+  color: var(--foreground);
   transition: opacity 160ms ease;
 }
 
@@ -1240,4 +1212,18 @@ body > .skiptranslate,
 body > iframe.skiptranslate {
   display: none !important;
   visibility: hidden !important;
+}
+
+/* Binary typography: no grey type — Tailwind opacity on foreground/muted reads as full */
+[class*="text-foreground/"] {
+  color: var(--foreground) !important;
+}
+[class*="text-muted-foreground"] {
+  color: var(--foreground) !important;
+}
+[class*="decoration-foreground/"] {
+  text-decoration-color: var(--foreground) !important;
+}
+[class*="text-sidebar-foreground/"] {
+  color: var(--sidebar-foreground) !important;
 }

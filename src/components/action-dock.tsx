@@ -247,7 +247,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
         <ChevronLeft size={16} strokeWidth={2} />
       </button>
 
-      <div className="glass-dock flex items-center p-0.5 gap-0 rounded-[16px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.99]">
+      <div className="glass-dock flex items-center p-0.5 gap-0 rounded-[16px] transition-all duration-200 hover:scale-[1.004] active:scale-[0.99]">
         {/* Like */}
         <LikeButton
           date={entry.date}
@@ -269,7 +269,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
               trigger([{ duration: 15 }], { intensity: 0.4 });
               setShareOpen((open) => !open);
             }}
-            className="dock-inline-action relative flex items-center gap-1.5 overflow-hidden rounded-[12px] px-2.5 py-2 text-foreground transition-colors duration-200 cursor-pointer hover:bg-accent"
+            className="dock-inline-action relative flex items-center gap-1.5 overflow-hidden rounded-[12px] px-2.5 py-2 text-foreground transition-colors duration-200 cursor-pointer hover:bg-foreground/[0.05] dark:hover:bg-foreground/[0.07]"
             data-open={shareOpen ? "true" : "false"}
             aria-label="Share page"
             aria-haspopup="menu"
@@ -321,9 +321,9 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
                 {shareOpen && (
                   <div
                     ref={shareMenuRef}
-                    className="glass-dock dropdown-panel fixed z-[90] w-[148px] rounded-[16px] p-1.5"
+                    className="glass-dock dropdown-panel fixed z-[90] w-[140px] rounded-[16px] p-1.5"
                     style={{
-                      right: shareMenuPos.right,
+                      right: shareMenuPos.right + 5,
                       bottom: shareMenuPos.bottom,
                     }}
                   >

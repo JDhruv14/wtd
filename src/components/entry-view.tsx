@@ -14,7 +14,7 @@ import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { getTopicColor, TOPICS } from "@/lib/topics";
 import type { Entry, EntryMetadata } from "@/lib/types";
-import { socialLinks } from "@/../content/sidebar/profile";
+import { socialLinks } from "@content/sidebar/profile";
 
 export type EmptyEntry = {
   date: string;
