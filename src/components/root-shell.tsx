@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Github, Star } from "lucide-react";
 import {
@@ -14,6 +14,7 @@ import { SiteLogo } from "@/components/site-logo";
 import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { PageTranslator } from "@/components/ui/page-language";
+import { ABOUT_PANEL_HASH, SIDEBAR_VIEW_STORAGE_KEY } from "@/lib/sidebar-view";
 import { cn } from "@/lib/utils";
 import type { DayData, Entry, MonthData } from "@/lib/types";
 import { socialLinks } from "@content/sidebar/profile";
@@ -102,7 +103,60 @@ export function RootShell({
   const router = useRouter();
   const pathname = usePathname();
   const [mobile, setMobile] = useState(false);
-  const [activeView, setActiveView] = useState<"day" | "about">("day");
+  const [activeView, setActiveView] = useState<"day" | "about">(() => {
+    if (typeof window === "undefined") return "day";
+    try {
+      const stored = sessionStorage.getItem(SIDEBAR_VIEW_STORAGE_KEY);
+      if (stored === "about" || stored === "day") return stored;
+    } catch {
+      /* ignore private mode / quota */
+    }
+    return window.location.hash === ABOUT_PANEL_HASH ? "about" : "day";
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SIDEBAR_VIEW_STORAGE_KEY, activeView);
+    } catch {
+      /* ignore */
+    }
+  }, [activeView]);
+
+  /** Keep sidebar view in sync when #about changes via link, back/forward, or external history. */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncFromLocation = () => {
+      const isAbout = window.location.hash === ABOUT_PANEL_HASH;
+      setActiveView((prev) => {
+        const next = isAbout ? "about" : "day";
+        if (prev === next) return prev;
+        try {
+          sessionStorage.setItem(SIDEBAR_VIEW_STORAGE_KEY, next);
+        } catch {
+          /* ignore */
+        }
+        return next;
+      });
+    };
+    window.addEventListener("hashchange", syncFromLocation);
+    window.addEventListener("popstate", syncFromLocation);
+    return () => {
+      window.removeEventListener("hashchange", syncFromLocation);
+      window.removeEventListener("popstate", syncFromLocation);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const path = window.location.pathname + window.location.search;
+    if (activeView === "about") {
+      if (window.location.hash !== ABOUT_PANEL_HASH) {
+        history.replaceState(null, "", `${path}${ABOUT_PANEL_HASH}`);
+      }
+    } else if (window.location.hash === ABOUT_PANEL_HASH) {
+      history.replaceState(null, "", path);
+    }
+  }, [activeView, pathname]);
 
   useEffect(() => {
     const onResize = () => setMobile(window.innerWidth < 768);
@@ -117,8 +171,25 @@ export function RootShell({
   }, [pathname]);
 
   const handleDayClick = (day: DayData) => {
+    try {
+      sessionStorage.setItem(SIDEBAR_VIEW_STORAGE_KEY, "day");
+    } catch {
+      /* ignore */
+    }
     setActiveView("day");
     router.push(`/${day.date}`);
+  };
+
+  const handleAboutClick = () => {
+    setActiveView((v) => {
+      const next = v === "about" ? "day" : "about";
+      try {
+        sessionStorage.setItem(SIDEBAR_VIEW_STORAGE_KEY, next);
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
   };
 
   return (
@@ -137,9 +208,7 @@ export function RootShell({
           monthsData={monthsData}
           selectedDate={selectedDate}
           onDayClick={handleDayClick}
-          onAboutClick={() =>
-            setActiveView((v) => (v === "about" ? "day" : "about"))
-          }
+          onAboutClick={handleAboutClick}
           activeView={activeView}
           totalEntries={allEntryDates.length}
           recentEntries={recentEntries}

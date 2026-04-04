@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
+    "/": ["./content/**/*"],
     "/*": ["./content/**/*"],
+    "/[date]": ["./content/**/*"],
+    "/api/metadata": ["./content/**/*"],
   },
   images: {
     dangerouslyAllowSVG: true,

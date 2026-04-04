@@ -1,33 +1,55 @@
-import fs from 'fs';
-import path from 'path';
-import type { Entry, DayData, MonthData } from './types';
-import { GENRE_MAP, getTopicColor } from './topics';
+import fs from "fs";
+import path from "path";
+import type { Entry, DayData, MonthData } from "./types";
+import { GENRE_MAP, getTopicColor } from "./topics";
 
-// Content lives at: content/YYYY/MM/YYYY-MM-DD.md
-const CONTENT_DIR = path.join(process.cwd(), 'content');
+/** Resolve `content/` — cwd differs on Cloudflare Workers / OpenNext vs local dev. */
+function getContentDir(): string {
+  const candidates = [
+    path.join(process.cwd(), "content"),
+    path.join(process.cwd(), "..", "content"),
+    path.join(process.cwd(), "..", "..", "content"),
+  ];
+  for (const dir of candidates) {
+    if (fs.existsSync(dir)) return dir;
+  }
+  return path.join(process.cwd(), "content");
+}
 
 const MONTH_ABBR: Record<number, string> = {
-  1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR',
-  5: 'MAY', 6: 'JUN', 7: 'JUL', 8: 'AUG',
-  9: 'SEP', 10: 'OCT', 11: 'NOV', 12: 'DEC',
+  1: "JAN",
+  2: "FEB",
+  3: "MAR",
+  4: "APR",
+  5: "MAY",
+  6: "JUN",
+  7: "JUL",
+  8: "AUG",
+  9: "SEP",
+  10: "OCT",
+  11: "NOV",
+  12: "DEC",
 };
 
 type FMeta = { [key: string]: string | undefined };
 
 function parseFrontmatter(src: string): { meta: FMeta; body: string } {
   const s = src.trimStart();
-  if (!s.startsWith('---')) return { meta: {}, body: s };
-  const nl = s.indexOf('\n', 3);
+  if (!s.startsWith("---")) return { meta: {}, body: s };
+  const nl = s.indexOf("\n", 3);
   if (nl === -1) return { meta: {}, body: s };
-  const endFm = s.indexOf('\n---', nl);
+  const endFm = s.indexOf("\n---", nl);
   if (endFm === -1) return { meta: {}, body: s };
 
   const meta: FMeta = {};
-  for (const line of s.slice(nl + 1, endFm).split('\n')) {
-    const sep = line.indexOf(':');
+  for (const line of s.slice(nl + 1, endFm).split("\n")) {
+    const sep = line.indexOf(":");
     if (sep === -1) continue;
     const k = line.slice(0, sep).trim();
-    const v = line.slice(sep + 1).trim().replace(/^["']|["']$/g, '');
+    const v = line
+      .slice(sep + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
     if (k && v) meta[k] = v;
   }
 
@@ -36,25 +58,29 @@ function parseFrontmatter(src: string): { meta: FMeta; body: string } {
 
 /** Auto-detect media_type from a URL when not explicitly set. */
 function inferMediaType(url: string): string {
-  if (!url) return 'article';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'video';
-  if (url.includes('spotify.com')) return 'link';
-  if (url.includes('twitter.com') || url.includes('x.com')) return 'tweet';
-  if (url.includes('music.apple.com')) return 'link';
-  return 'link';
+  if (!url) return "article";
+  if (url.includes("youtube.com") || url.includes("youtu.be")) return "video";
+  if (url.includes("spotify.com")) return "link";
+  if (url.includes("twitter.com") || url.includes("x.com")) return "tweet";
+  if (url.includes("music.apple.com")) return "link";
+  return "link";
 }
 
 /** URL → icon name for well-known domains. */
 const URL_ICON_MAP: Array<[string, string]> = [
-  ['youtube.com', 'youtube'], ['youtu.be', 'youtube'],
-  ['twitter.com', 'tweet'],   ['x.com', 'tweet'],
-  ['spotify.com', 'music'],
-  ['music.apple.com', 'album'],
-  ['soundcloud.com', 'music'],
-  ['letterboxd.com', 'movie'],
-  ['podcasts.apple.com', 'podcast'], ['podcastindex.org', 'podcast'],
-  ['github.com', 'code'],
-  ['dribbble.com', 'design'], ['behance.net', 'design'],
+  ["youtube.com", "youtube"],
+  ["youtu.be", "youtube"],
+  ["twitter.com", "tweet"],
+  ["x.com", "tweet"],
+  ["spotify.com", "music"],
+  ["music.apple.com", "album"],
+  ["soundcloud.com", "music"],
+  ["letterboxd.com", "movie"],
+  ["podcasts.apple.com", "podcast"],
+  ["podcastindex.org", "podcast"],
+  ["github.com", "code"],
+  ["dribbble.com", "design"],
+  ["behance.net", "design"],
 ];
 
 /**
@@ -66,10 +92,13 @@ function inferIconName(url: string, genre: string | undefined): string {
     if (url.includes(domain)) return icon;
   }
   if (genre) {
-    const first = genre.trim().toLowerCase().split(/[,\s]+/)[0];
+    const first = genre
+      .trim()
+      .toLowerCase()
+      .split(/[,\s]+/)[0];
     if (first && GENRE_MAP[first]) return GENRE_MAP[first].icon;
   }
-  return 'sparkle';
+  return "sparkle";
 }
 
 /** Recursively collect all YYYY-MM-DD.md file paths under CONTENT_DIR. */
@@ -92,21 +121,25 @@ function collectMdFiles(dir: string): string[] {
 
 export function loadMdEntries(): Entry[] {
   try {
-    const files = collectMdFiles(CONTENT_DIR);
+    const files = collectMdFiles(getContentDir());
 
     return files.map((filePath, idx) => {
       const date = path.basename(filePath).slice(0, 10);
-      const raw = fs.readFileSync(filePath, 'utf-8');
+      const raw = fs.readFileSync(filePath, "utf-8");
       const { meta, body } = parseFrontmatter(raw);
-      const mediaUrl = meta.url ?? meta.media_url ?? '';
-      const mediaType = meta['media-type'] ?? meta.media_type ?? inferMediaType(mediaUrl);
-      const iconName = meta['icon-name'] ?? meta.icon_name ?? inferIconName(mediaUrl, meta.genre);
-      
+      const mediaUrl = meta.url ?? meta.media_url ?? "";
+      const mediaType =
+        meta["media-type"] ?? meta.media_type ?? inferMediaType(mediaUrl);
+      const iconName =
+        meta["icon-name"] ??
+        meta.icon_name ??
+        inferIconName(mediaUrl, meta.genre);
+
       return {
         id: 10000 + idx,
         created_at: `${date}T00:00:00.000Z`,
         date,
-        title: meta.title ?? '',
+        title: meta.title ?? "",
         content: body,
         media_type: mediaType,
         media_url: mediaUrl,
@@ -127,9 +160,9 @@ export function loadMdEntries(): Entry[] {
 
 export function buildMergedMonthsData(
   allEntries: Entry[],
-  today: string
+  today: string,
 ): MonthData[] {
-  const entryMap = new Map(allEntries.map(e => [e.date, e]));
+  const entryMap = new Map(allEntries.map((e) => [e.date, e]));
 
   const monthKeys = new Set<string>();
 
@@ -143,7 +176,7 @@ export function buildMergedMonthsData(
     const minMonth = year === startYear ? startMonth : 1;
     const maxMonth = 12; // Show the full year natively without needing external data
     for (let month = minMonth; month <= maxMonth; month++) {
-      const monthStr = String(month).padStart(2, '0');
+      const monthStr = String(month).padStart(2, "0");
       monthKeys.add(`${year}-${monthStr}`);
     }
   }
@@ -153,23 +186,26 @@ export function buildMergedMonthsData(
     monthKeys.add(e.date.slice(0, 7));
   }
 
-  return Array.from(monthKeys).sort().reverse().map(key => {
-    const [y, m] = key.split('-').map(Number);
-    const daysInMonth = new Date(y, m, 0).getDate();
-    const days: DayData[] = Array.from({ length: daysInMonth }, (_, i) => {
-      const day = i + 1;
-      const date = `${key}-${String(day).padStart(2, '0')}`;
-      const entry = entryMap.get(date);
-      return {
-        day,
-        date,
-        hasContent: !!entry,
-        isToday: date === today,
-        iconName: entry?.icon_name ?? null,
-        primaryColor: entry?.primary_color ?? null,
-        genre: entry?.genre ?? null,
-      };
+  return Array.from(monthKeys)
+    .sort()
+    .reverse()
+    .map((key) => {
+      const [y, m] = key.split("-").map(Number);
+      const daysInMonth = new Date(y, m, 0).getDate();
+      const days: DayData[] = Array.from({ length: daysInMonth }, (_, i) => {
+        const day = i + 1;
+        const date = `${key}-${String(day).padStart(2, "0")}`;
+        const entry = entryMap.get(date);
+        return {
+          day,
+          date,
+          hasContent: !!entry,
+          isToday: date === today,
+          iconName: entry?.icon_name ?? null,
+          primaryColor: entry?.primary_color ?? null,
+          genre: entry?.genre ?? null,
+        };
+      });
+      return { month: MONTH_ABBR[m], year: String(y), days };
     });
-    return { month: MONTH_ABBR[m], year: String(y), days };
-  });
 }

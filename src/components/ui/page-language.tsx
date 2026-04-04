@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { Check, Languages } from "lucide-react";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
+import { pinAboutHashBeforeReload } from "@/lib/sidebar-view";
 import { cn } from "@/lib/utils";
 
 const LANGUAGE_OPTIONS = [
@@ -32,7 +33,8 @@ declare global {
 }
 
 const STORAGE_KEY = "btw-language";
-const EVENT_NAME = "btw-language-change";
+/** Dispatched when the user picks a language (Google Translate may reload the page). */
+export const BTW_LANGUAGE_CHANGE_EVENT = "btw-language-change";
 
 function hideTranslateArtifacts() {
   const selectors = [
@@ -80,9 +82,11 @@ function applyLanguage(language: LanguageCode) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, language);
   setGoogleTranslateCookie(language);
-  document.documentElement.lang = language;
-  window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: language }));
-  window.setTimeout(() => window.location.reload(), 60);
+  window.dispatchEvent(
+    new CustomEvent(BTW_LANGUAGE_CHANGE_EVENT, { detail: language }),
+  );
+  pinAboutHashBeforeReload();
+  window.location.reload();
 }
 
 export function PageTranslator() {
@@ -233,8 +237,12 @@ export function LanguageToggle({
       if (next) setLanguageState(next);
     };
 
-    window.addEventListener(EVENT_NAME, handleLanguageChange);
-    return () => window.removeEventListener(EVENT_NAME, handleLanguageChange);
+    window.addEventListener(BTW_LANGUAGE_CHANGE_EVENT, handleLanguageChange);
+    return () =>
+      window.removeEventListener(
+        BTW_LANGUAGE_CHANGE_EVENT,
+        handleLanguageChange,
+      );
   }, []);
 
   useEffect(() => {

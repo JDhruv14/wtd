@@ -880,10 +880,10 @@ export function AppSidebar({
         <div
           ref={aboutRef}
           className={cn(
-            "absolute inset-0 overflow-y-auto flex flex-col transition-all duration-300 ease-out",
+            "absolute inset-0 flex flex-col overflow-y-auto transition-all duration-300 ease-out",
             activeView === "about"
-              ? "opacity-100 translate-x-0 pointer-events-auto"
-              : "opacity-0 translate-x-4 pointer-events-none",
+              ? "pointer-events-auto translate-x-0 opacity-100"
+              : "pointer-events-none translate-x-4 opacity-0",
           )}
         >
           <AboutPanel isVisible={activeView === "about"} />
