@@ -89,7 +89,9 @@ body {
 }
 
 /* ── Typography utilities ── */
-.tracking-premium { letter-spacing: 1.2px; }
+.tracking-premium {
+  letter-spacing: 1.2px;
+}
 
 /* ── TipTap / content styles ── */
 .tiptap-content a {
@@ -99,11 +101,21 @@ body {
   text-decoration-color: var(--foreground);
   transition: text-decoration-color 0.15s;
 }
-.tiptap-content a:hover { text-decoration-color: var(--foreground); }
-.dark .tiptap-content a { text-decoration-color: var(--foreground); }
-.dark .tiptap-content a:hover { text-decoration-color: var(--foreground); }
-.tiptap-content strong { font-weight: 700; }
-.tiptap-content em { opacity: 1; }
+.tiptap-content a:hover {
+  text-decoration-color: var(--foreground);
+}
+.dark .tiptap-content a {
+  text-decoration-color: var(--foreground);
+}
+.dark .tiptap-content a:hover {
+  text-decoration-color: var(--foreground);
+}
+.tiptap-content strong {
+  font-weight: 700;
+}
+.tiptap-content em {
+  opacity: 1;
+}
 .tiptap-content blockquote {
   margin: 1.5rem 0;
   border-left: 2px solid var(--border);
@@ -130,8 +142,7 @@ body {
     inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
     inset 1.5px 0 0 rgba(255, 255, 255, 0.45),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.2),
-    /* depth */
-    0 8px 20px rgba(0, 0, 0, 0.12),
+    /* depth */ 0 8px 20px rgba(0, 0, 0, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.06),
     0 -12px 28px inset rgba(0, 0, 0, 0.06);
 }
@@ -402,7 +413,7 @@ body {
 }
 .dark [data-slot="sidebar-container"] {
   border-radius: 0 22px 22px 0 !important;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* sidebar-inner == [data-sidebar="sidebar"] — same DOM element.
@@ -640,12 +651,11 @@ body {
 .entry-hero-panel {
   border-radius: 28px;
   border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent);
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--background) 86%, transparent),
-      color-mix(in srgb, var(--background) 72%, transparent)
-    );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--background) 86%, transparent),
+    color-mix(in srgb, var(--background) 72%, transparent)
+  );
   padding: 1.1rem 1.1rem 1rem;
   backdrop-filter: blur(18px) saturate(150%);
   -webkit-backdrop-filter: blur(18px) saturate(150%);
@@ -657,12 +667,11 @@ body {
 .entry-media-frame {
   border-radius: 32px;
   border: 1px solid color-mix(in srgb, var(--foreground) 5%, transparent);
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--background) 74%, transparent),
-      color-mix(in srgb, var(--background) 58%, transparent)
-    );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--background) 74%, transparent),
+    color-mix(in srgb, var(--background) 58%, transparent)
+  );
   padding: clamp(0.5rem, 1vw, 0.75rem);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
@@ -674,12 +683,11 @@ body {
 .entry-side-note {
   border-radius: 26px;
   border: 1px solid color-mix(in srgb, var(--foreground) 5%, transparent);
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--background) 84%, transparent),
-      color-mix(in srgb, var(--background) 68%, transparent)
-    );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--background) 84%, transparent),
+    color-mix(in srgb, var(--background) 68%, transparent)
+  );
   padding: 1rem;
   backdrop-filter: blur(18px) saturate(148%);
   -webkit-backdrop-filter: blur(18px) saturate(148%);
@@ -691,12 +699,11 @@ body {
 .entry-reading-shell {
   border-radius: 28px;
   border: 1px solid color-mix(in srgb, var(--foreground) 5%, transparent);
-  background:
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--background) 84%, transparent),
-      color-mix(in srgb, var(--background) 70%, transparent)
-    );
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--background) 84%, transparent),
+    color-mix(in srgb, var(--background) 70%, transparent)
+  );
   padding: clamp(1rem, 2vw, 1.4rem);
   backdrop-filter: blur(18px) saturate(148%);
   -webkit-backdrop-filter: blur(18px) saturate(148%);
@@ -724,14 +731,13 @@ body {
   position: absolute;
   inset: 10px 5px;
   border-radius: 9999px;
-  background:
-    linear-gradient(
-      to bottom,
-      transparent 0%,
-      color-mix(in srgb, var(--foreground) 10%, transparent) 28%,
-      color-mix(in srgb, var(--foreground) 12%, transparent) 72%,
-      transparent 100%
-    );
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--foreground) 10%, transparent) 28%,
+    color-mix(in srgb, var(--foreground) 12%, transparent) 72%,
+    transparent 100%
+  );
   opacity: 0.55;
 }
 
@@ -771,13 +777,12 @@ body {
   translate: -50% 0;
   transform-origin: bottom;
   border-radius: 9999px;
-  background:
-    linear-gradient(
-      to top,
-      color-mix(in srgb, var(--foreground) 38%, transparent) 0%,
-      color-mix(in srgb, var(--foreground) 24%, transparent) 55%,
-      color-mix(in srgb, var(--foreground) 18%, transparent) 100%
-    );
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--foreground) 38%, transparent) 0%,
+    color-mix(in srgb, var(--foreground) 24%, transparent) 55%,
+    color-mix(in srgb, var(--foreground) 18%, transparent) 100%
+  );
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--foreground) 8%, transparent),
     0 0 18px color-mix(in srgb, var(--foreground) 10%, transparent);
@@ -798,7 +803,6 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.45),
     0 10px 18px rgba(0, 0, 0, 0.1);
 }
-
 
 .dark .entry-hero-panel,
 .dark .entry-media-frame,
@@ -833,8 +837,14 @@ body {
 ══════════════════════════════════════════ */
 
 @keyframes entryReveal {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .entry-reveal {
   opacity: 0;
@@ -850,32 +860,61 @@ body {
 }
 
 @keyframes slideUpFade {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-slide-up {
   opacity: 0;
   animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 .animate-shimmer {
-  background: linear-gradient(90deg, var(--muted) 25%, rgba(128,128,128,0.07) 50%, var(--muted) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    rgba(128, 128, 128, 0.07) 50%,
+    var(--muted) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.6s ease-in-out infinite;
 }
 
 /* ── 3D / flip card ── */
-.rotate-y-180 { transform: rotateY(180deg); }
-.preserve-3d { transform-style: preserve-3d; }
-.backface-hidden { backface-visibility: hidden; }
-.perspective-1000 { perspective: 1000px; }
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.perspective-1000 {
+  perspective: 1000px;
+}
 
 /* ── Sidebar about-panel bottom fade ── */
 .sidebar-about-fade {
@@ -883,7 +922,9 @@ body {
 }
 
 /* ── Duration utilities ── */
-.duration-250 { transition-duration: 250ms; }
+.duration-250 {
+  transition-duration: 250ms;
+}
 
 /* ── Sileo toast: shift center viewport with main column (sidebar). Only touch `left`; keep Sileo’s own motion on the toast. */
 /* --toast-center-offset: AppSidebar — mobile 0; desktop expanded 160px (320px/2); desktop collapsed 1.5rem (icon rail/2) */
@@ -911,9 +952,17 @@ body {
 
 /* ── Glass ripple (scatter effect on click) ── */
 @keyframes glassRipple {
-  0%   { transform: scale(0);  opacity: 0.65; }
-  40%  { opacity: 0.4; }
-  100% { transform: scale(28); opacity: 0; }
+  0% {
+    transform: scale(0);
+    opacity: 0.65;
+  }
+  40% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(28);
+    opacity: 0;
+  }
 }
 .glass-ripple-anim {
   border: 1.5px solid rgba(255, 255, 255, 0.75);
@@ -927,7 +976,8 @@ body {
 
 /* Hover-peek support: when the desktop sidebar is temporarily revealed while collapsed,
    keep the inner glass panel visible instead of applying the collapsed blur/fade state. */
-[data-slot="sidebar-container"][data-peek-open="true"] [data-slot="sidebar-inner"] {
+[data-slot="sidebar-container"][data-peek-open="true"]
+  [data-slot="sidebar-inner"] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
@@ -960,7 +1010,6 @@ html:not(.dark) .dropdown-panel.glass-dock {
   background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
   border-color: color-mix(in srgb, var(--foreground) 9%, transparent);
 }
-
 
 .filter-dropdown {
   display: flex;
@@ -1101,7 +1150,6 @@ html:not(.dark) .dropdown-panel.glass-dock {
   transition: opacity 160ms ease;
 }
 
-
 .instrument-serif-regular {
   font-family: "Instrument Serif", serif;
   font-weight: 400;
@@ -1113,7 +1161,6 @@ html:not(.dark) .dropdown-panel.glass-dock {
   font-weight: 400;
   font-style: italic;
 }
-
 
 .VIpgJd-ZVi9od-ORHb,
 .goog-te-banner-frame.skiptranslate,
