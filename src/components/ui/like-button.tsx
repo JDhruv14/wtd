@@ -89,7 +89,7 @@ export function LikeButton({
       onLikeChange?.(true, newCount, true);
       sileo.success({
         title: "Love Alert",
-        description: "Thank you so much ⸜(｡˃ ᵕ ˂ )⸝♡",
+        description: "Thank you so much for your support ⸜(｡˃ ᵕ ˂ )⸝♡",
         icon: (
           <Heart
             size={16}

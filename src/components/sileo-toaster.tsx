@@ -1,9 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useLayoutEffect, useState, useSyncExternalStore } from "react";
 import { Toaster } from "sileo";
-
-const MOBILE_MQ = "(max-width: 767px)";
 
 /** Below `DesktopUtilityRail` in entry-view (top-3 + pt-4 + h-8 ≈ 60px) + small gap */
 const DESKTOP_TOAST_TOP_PX = 72;
@@ -23,39 +21,28 @@ function getServerDarkSnapshot() {
   return false;
 }
 
-function subscribeMobile(cb: () => void) {
-  const mql = window.matchMedia(MOBILE_MQ);
-  mql.addEventListener("change", cb);
-  return () => mql.removeEventListener("change", cb);
-}
-
-function getMobileSnapshot() {
-  return window.matchMedia(MOBILE_MQ).matches;
-}
-
-function getServerMobileSnapshot() {
-  return false;
-}
-
 export function SileoToaster() {
+  /** Matches globals `@media (max-width: 767px)`. Deferred until mount so SSR/first paint stay `top-right` and avoid hydration mismatch. */
+  const [isMobile, setIsMobile] = useState(false);
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   const isDark = useSyncExternalStore(
     subscribeDarkClass,
     getDarkModeSnapshot,
     getServerDarkSnapshot,
-  );
-  const isMobile = useSyncExternalStore(
-    subscribeMobile,
-    getMobileSnapshot,
-    getServerMobileSnapshot,
   );
 
   return (
     <Toaster
       position={isMobile ? "top-center" : "top-right"}
       theme="system"
-      offset={{
-        top: isMobile ? 20 : DESKTOP_TOAST_TOP_PX,
-      }}
+      offset={isMobile ? undefined : { top: DESKTOP_TOAST_TOP_PX }}
       options={
         isDark
           ? undefined
