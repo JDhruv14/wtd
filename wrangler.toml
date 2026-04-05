@@ -3,7 +3,7 @@
 # https://opennext.js.org/cloudflare/get-started
 
 # Must match the Worker name in the Cloudflare dashboard / deploy target
-name = "wtd"
+name = "what-the-dhruv"
 main = ".open-next/worker.js"
 # Must be 2024-09-23 or later for @opennextjs/cloudflare
 compatibility_date = "2026-04-02"
