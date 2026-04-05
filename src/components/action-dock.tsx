@@ -18,46 +18,9 @@ interface ActionDockProps {
   allEntryDates?: string[];
 }
 
-// ── Like state helper ────────────────────────────────────────────────────────
-function getLikeState(entry: Entry | null, completedDates: Set<string>) {
-  if (!entry?.date)
-    return { initialCount: 0, defaultLiked: false, completed: false };
-  if (typeof window === "undefined") {
-    return {
-      initialCount: entry.like_count || 0,
-      defaultLiked: false,
-      completed: false,
-    };
-  }
-  const completedList: string[] = JSON.parse(
-    localStorage.getItem("completed_like_entries") || "[]",
-  );
-  const isCompleted =
-    completedDates.has(entry.date) || completedList.includes(entry.date);
-  if (isCompleted) {
-    return {
-      initialCount: (entry.like_count || 0) + 4,
-      defaultLiked: true,
-      completed: true,
-    };
-  }
-  const likedEntries = JSON.parse(
-    localStorage.getItem("liked_entries") || "{}",
-  );
-  const userLiked = Boolean(likedEntries[entry.date]);
-  return {
-    initialCount: (entry.like_count || 0) + (userLiked ? 1 : 0),
-    defaultLiked: userLiked,
-    completed: false,
-  };
-}
-
 export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
   const [shareOpen, setShareOpen] = useState(false);
   const [shareFeedback, setShareFeedback] = useState<"idle" | "copied">("idle");
-  const [completedDates, setCompletedDates] = useState<Set<string>>(
-    () => new Set(),
-  );
   const [apiCount, setApiCount] = useState<number | null>(null);
   const [apiTaps, setApiTaps] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
@@ -83,7 +46,10 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
         setApiCount(d.count ?? 0);
         setApiTaps(d.taps ?? 0);
       })
-      .catch(() => {});
+      .catch(() => {
+        setApiCount(0);
+        setApiTaps(0);
+      });
   }, [entry?.date]);
 
   // allEntryDates is newest-first; higher index = older
@@ -94,27 +60,22 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
       : null; // older
   const nextDate = currentIdx > 0 ? allEntryDates[currentIdx - 1] : null; // newer
 
-  const localLikeState = entry
-    ? getLikeState(entry, completedDates)
-    : { initialCount: 0, defaultLiked: false, completed: false };
-
-  // Merge seed count with Redis count; use IP taps for fill level
+  /** GET finished — Redis is the only source of truth for count + per-IP taps */
+  const likeApiReady = apiCount !== null;
   const seedCount = entry?.like_count ?? 0;
-  const initialCount = seedCount + (apiCount ?? 0);
-  const ipCompleted = apiTaps >= 4;
+  const initialCount = likeApiReady ? seedCount + (apiCount ?? 0) : seedCount;
   const likeState = {
     initialCount,
-    defaultLiked: localLikeState.defaultLiked || apiTaps > 0,
-    completed: localLikeState.completed || ipCompleted,
+    completed: likeApiReady && apiTaps >= 4,
+    initialTaps: likeApiReady ? apiTaps : undefined,
   };
 
   const handleLikeChange = (
-    liked: boolean,
+    _liked: boolean,
     _count: number,
     completed?: boolean,
   ) => {
     if (!entry?.date || typeof window === "undefined") return;
-    // Post tap to Redis (fire-and-forget)
     fetch("/api/like", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -122,30 +83,10 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
     })
       .then((r) => r.json())
       .then((d) => {
-        if (typeof d.count === "number") {
-          const delta = d.count - seedCount;
-          setApiCount(delta > 0 ? delta : 0);
-        }
-        if (typeof d.taps === "number") {
-          setApiTaps(d.taps);
-        }
+        if (typeof d.count === "number") setApiCount(d.count);
+        if (typeof d.taps === "number") setApiTaps(d.taps);
       })
       .catch(() => {});
-
-    if (completed) {
-      setCompletedDates((prev) => new Set(prev).add(entry.date));
-      const list: string[] = JSON.parse(
-        localStorage.getItem("completed_like_entries") || "[]",
-      );
-      if (!list.includes(entry.date)) list.push(entry.date);
-      localStorage.setItem("completed_like_entries", JSON.stringify(list));
-    }
-    const likedEntries = JSON.parse(
-      localStorage.getItem("liked_entries") || "{}",
-    );
-    if (liked) likedEntries[entry.date] = true;
-    else delete likedEntries[entry.date];
-    localStorage.setItem("liked_entries", JSON.stringify(likedEntries));
   };
 
   const copyPageUrl = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -281,8 +222,8 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
         <LikeButton
           date={entry.date}
           initialCount={likeState.initialCount}
-          defaultLiked={likeState.defaultLiked}
           completed={likeState.completed}
+          initialTaps={likeState.initialTaps}
           onLikeChange={handleLikeChange}
           className="dock-inline-action"
         />

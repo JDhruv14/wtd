@@ -20,7 +20,8 @@ export interface LikeButtonProps {
   className?: string;
   date?: string;
   initialCount?: number;
-  defaultLiked?: boolean;
+  /** This viewer's tap count (0–4) from Redis — heart fill matches exactly after refresh */
+  initialTaps?: number;
   completed?: boolean;
   onLikeChange?: (liked: boolean, count: number, completed?: boolean) => void;
 }
@@ -29,13 +30,15 @@ export function LikeButton({
   className,
   date,
   initialCount = 0,
-  defaultLiked = false,
+  initialTaps,
   completed = false,
   onLikeChange,
 }: LikeButtonProps) {
   const { trigger: haptic } = useWebHaptics();
   const [likeCount, setLikeCount] = React.useState(initialCount);
-  const [fillLevel, setFillLevel] = React.useState(completed ? FILL_MAX : 0);
+  const [fillLevel, setFillLevel] = React.useState(() =>
+    completed ? FILL_MAX : Math.min(initialTaps ?? 0, FILL_MAX),
+  );
   const [isCelebrating, setIsCelebrating] = React.useState(false);
   // On first mount only: count up from 0 for the entrance animation
   const [mountDone, setMountDone] = React.useState(false);
@@ -44,10 +47,21 @@ export function LikeButton({
     return () => clearTimeout(t);
   }, []);
 
-  // When initialCount rises (API data loaded) smoothly count up — but never decrease
+  // Displayed total always follows server + seed from parent (GET + each POST response)
   React.useEffect(() => {
-    setLikeCount((c) => (initialCount > c ? initialCount : c));
+    setLikeCount(initialCount);
   }, [initialCount]);
+
+  // Heart fill follows Redis taps; Math.max avoids a slower POST overwriting a newer optimistic tap
+  React.useEffect(() => {
+    if (completed || (initialTaps !== undefined && initialTaps >= FILL_MAX)) {
+      setFillLevel(FILL_MAX);
+      return;
+    }
+    if (initialTaps !== undefined) {
+      setFillLevel((prev) => Math.max(prev, initialTaps));
+    }
+  }, [completed, initialTaps, date]);
 
   // On navigation (date changes): reset state immediately with no animation
   const prevDate = React.useRef(date);
@@ -55,7 +69,7 @@ export function LikeButton({
     if (date !== prevDate.current) {
       prevDate.current = date;
       setLikeCount(initialCount);
-      setFillLevel(completed ? FILL_MAX : 0);
+      setFillLevel(completed ? FILL_MAX : Math.min(initialTaps ?? 0, FILL_MAX));
       setIsCelebrating(false);
       setMountDone(true); // skip entrance animation on navigation
     }
