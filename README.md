@@ -33,9 +33,12 @@ npm install
 `.env`:
 
 ```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
+
+`NEXT_PUBLIC_SITE_URL` should be your live origin (no trailing slash). Without it, Open Graph tags can point at `localhost` and previews break. Social image defaults to **`public/gh_image.png`**; override with `NEXT_PUBLIC_OG_IMAGE=/other.png` if needed.
 
 ```bash
 npm run dev

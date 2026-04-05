@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DatePageClient } from "@/app/[date]/date-page-client";
+import { getOgImagePath } from "@/lib/og-image";
 import { getStableSiteData } from "@/lib/site-data";
 import type { EmptyEntry } from "@/components/entry-view";
 
@@ -46,7 +47,7 @@ export async function generateMetadata({
       : entry.content
     : `Check out ${entry.title || "this discovery"}.`;
 
-  const ogImage = "/og-image.png";
+  const ogImage = getOgImagePath();
   const canonical = `/${entry.date}`;
   const publishedTime = `${entry.date}T12:00:00.000Z`;
 
