@@ -212,7 +212,7 @@ export function RootShell({
         <SidebarInset>
           <div className="flex min-h-dvh flex-col md:h-full md:min-h-0 md:overflow-hidden">
             <MobileHeader />
-            <div className="flex flex-1 flex-col pt-12 md:pt-0 md:h-full md:min-h-0 md:overflow-hidden">
+            <div className="flex flex-1 flex-col md:h-full md:min-h-0 md:overflow-hidden">
               {children}
             </div>
           </div>

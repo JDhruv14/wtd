@@ -295,6 +295,8 @@ export function ContentParser({ content }: { content?: string | null }) {
   };
 
   lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+
     // Quote block  >
     if (line.startsWith("> ")) {
       quoteBlock.push(line.slice(2));
@@ -303,14 +305,14 @@ export function ContentParser({ content }: { content?: string | null }) {
     flushQuote(index);
 
     // @[url] — inline embed (YouTube, Spotify, or image)
-    const atMedia = line.match(/^@\[(.+)\]$/);
+    const atMedia = trimmedLine.match(/^@\[(.+)\]$/);
     if (atMedia) {
       rendered.push(renderAtMedia(atMedia[1].trim(), index));
       return;
     }
 
     // @![caption](url) — inline image with caption
-    const atImage = line.match(/^@!\[([^\]]*)\]\((.+)\)$/);
+    const atImage = trimmedLine.match(/^@!\[([^\]]*)\]\((.+)\)$/);
     if (atImage) {
       rendered.push(
         <InlineImage
@@ -323,7 +325,7 @@ export function ContentParser({ content }: { content?: string | null }) {
     }
 
     // Standard markdown image ![alt](url)
-    const mdImage = line.match(/^!\[([^\]]*)\]\((.+)\)$/);
+    const mdImage = trimmedLine.match(/^!\[([^\]]*)\]\((.+)\)$/);
     if (mdImage) {
       rendered.push(
         <InlineImage
@@ -336,7 +338,7 @@ export function ContentParser({ content }: { content?: string | null }) {
     }
 
     // Blank line
-    if (line.trim() === "") {
+    if (trimmedLine === "") {
       rendered.push(<div key={index} className="h-3" />);
       return;
     }

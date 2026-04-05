@@ -145,7 +145,7 @@ export function EntryView({
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 min-h-full flex-col bg-background md:h-full md:min-h-0">
+      <div className="flex flex-1 min-h-full flex-col bg-background pt-12 md:h-full md:min-h-0 md:pt-0">
         <DesktopRailSlot />
         <div className="w-full max-w-[980px] self-center px-6 pb-32 pt-6 md:px-10 md:pt-24">
           <div className="mx-auto max-w-[760px]">
@@ -165,7 +165,7 @@ export function EntryView({
 
   if (!entry) {
     return (
-      <div className="flex-1 h-full flex flex-col bg-background">
+      <div className="flex-1 h-full flex flex-col bg-background pt-12 md:pt-0">
         <DesktopRailSlot />
         <div className="flex-1 flex items-center justify-center px-6">
           <p className="font-mono text-[13px] text-muted-foreground uppercase tracking-premium">
@@ -178,7 +178,7 @@ export function EntryView({
 
   if ("isEmpty" in entry && entry.isEmpty) {
     return (
-      <div className="flex flex-1 min-h-full flex-col bg-background py-12 md:h-full md:min-h-0 md:py-0">
+      <div className="flex flex-1 min-h-full flex-col bg-background pt-12 md:h-full md:min-h-0 md:py-0 md:pt-0">
         <DesktopRailSlot />
         <div className="flex-1 flex items-center justify-center">
           <div
@@ -234,7 +234,7 @@ export function EntryView({
         style={{
           background: `linear-gradient(to bottom, ${overlayColor}14, transparent 42%)`,
         }}
-        className="absolute inset-x-0 top-0 h-[420px] pointer-events-none transition-[background] duration-700 ease-in-out"
+        className="absolute inset-x-0 top-0 h-[800px] md:h-[420px] pointer-events-none transition-[background] duration-700 ease-in-out"
       />
 
       <DesktopRailSlot />
