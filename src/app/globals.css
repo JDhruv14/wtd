@@ -893,6 +893,13 @@ body {
   transition-duration: 340ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
+/* Mobile: must clear .glass-header h-12 (3rem) — 42px still overlaps; offset + gap below bar */
+@media (max-width: 767px) {
+  [data-sileo-viewport][data-position^="top"] {
+    top: calc(3rem + 0.5rem) !important;
+    z-index: 40;
+  }
+}
 
 /* Center title + description copy (top-center: title pill above message — Sileo’s fixed order). */
 [data-sileo-toast] [data-sileo-description] {

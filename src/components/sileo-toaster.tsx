@@ -18,10 +18,6 @@ function getServerDarkSnapshot() {
   return false;
 }
 
-/**
- * Light mode: black pill + light text (Sileo styling guide).
- * Dark mode: library defaults (light fill on dark UI).
- */
 export function SileoToaster() {
   const isDark = useSyncExternalStore(
     subscribeDarkClass,
@@ -33,7 +29,7 @@ export function SileoToaster() {
     <Toaster
       position="top-center"
       theme="system"
-      offset={{ top: 16 }}
+      offset={{ top: 20 }}
       options={
         isDark
           ? undefined
