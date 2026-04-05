@@ -60,7 +60,6 @@ export function CalendarMonth({
             isToday={day.isToday}
             isSelected={day.date === selectedDate}
             isOptimistic={isOptimistic && day.date === selectedDate}
-            primaryColor={day.primaryColor}
             onClick={() => onDayClick(day)}
           />
         ))}

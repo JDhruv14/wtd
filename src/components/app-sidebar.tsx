@@ -51,12 +51,12 @@ function formatShortDate(dateStr: string) {
 }
 
 function matchesTopicFilter(
-  genre: string | null | undefined,
+  tags: string | null | undefined,
   iconName: string | null | undefined,
   selectedTopics: string[],
 ) {
   if (selectedTopics.length === 0) return true;
-  const topicKeys = getTopicKeysFromEntry(genre, iconName);
+  const topicKeys = getTopicKeysFromEntry(tags, iconName);
   return topicKeys.some((key) => selectedTopics.includes(key));
 }
 
@@ -67,10 +67,7 @@ interface AppSidebarProps {
   onAboutClick: () => void;
   activeView: "day" | "about";
   totalEntries?: number;
-  recentEntries?: Pick<
-    Entry,
-    "date" | "title" | "primary_color" | "icon_name" | "genre"
-  >[];
+  recentEntries?: Pick<Entry, "date" | "title" | "icon_name" | "tags">[];
 }
 
 export function AppSidebar({
@@ -237,9 +234,13 @@ export function AppSidebar({
   const availableTopics = useMemo(() => {
     const counts = new Map<string, number>();
 
-    recentEntries.forEach((entry) => {
-      getTopicKeysFromEntry(entry.genre, entry.icon_name).forEach((key) => {
-        counts.set(key, (counts.get(key) ?? 0) + 1);
+    // Count from all calendar days so filters reflect every post, not just favourites
+    monthsData.forEach((month) => {
+      month.days.forEach((day) => {
+        if (!day.hasContent) return;
+        getTopicKeysFromEntry(day.tags, day.iconName).forEach((key) => {
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        });
       });
     });
 
@@ -249,15 +250,7 @@ export function AppSidebar({
       label: topic.label,
       color: topic.color,
     }));
-  }, [recentEntries]);
-
-  const filteredRecentEntries = useMemo(
-    () =>
-      recentEntries.filter((entry) =>
-        matchesTopicFilter(entry.genre, entry.icon_name, selectedTopics),
-      ),
-    [recentEntries, selectedTopics],
-  );
+  }, [monthsData]);
 
   const filteredMonthsData = useMemo(
     () =>
@@ -269,7 +262,7 @@ export function AppSidebar({
           return {
             ...day,
             hasContent: matchesTopicFilter(
-              day.genre,
+              day.tags,
               day.iconName,
               selectedTopics,
             ),
@@ -784,16 +777,13 @@ export function AppSidebar({
               </span>
             </div>
 
-            {filteredRecentEntries.length > 0 ? (
+            {recentEntries.length > 0 ? (
               <div className="flex flex-col gap-0.5">
                 <AnimatePresence mode="popLayout" initial={false}>
-                  {filteredRecentEntries.map((entry, i) => {
-                    const accent =
-                      entry.primary_color ||
-                      getTopicColor(entry.icon_name) ||
-                      "#737373";
+                  {recentEntries.map((entry, i) => {
+                    const accent = getTopicColor(entry.icon_name) || "#737373";
                     const label =
-                      TOPICS[getTopicKeyFromEntry(entry.genre, entry.icon_name)]
+                      TOPICS[getTopicKeyFromEntry(entry.tags, entry.icon_name)]
                         ?.label ?? "Misc";
                     return (
                       <motion.div
@@ -815,8 +805,7 @@ export function AppSidebar({
                               hasContent: true,
                               isToday: false,
                               iconName: entry.icon_name,
-                              primaryColor: entry.primary_color,
-                              genre: entry.genre,
+                              tags: entry.tags,
                             })
                           }
                           className={cn(
@@ -855,23 +844,9 @@ export function AppSidebar({
                 </AnimatePresence>
               </div>
             ) : (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="sidebar-empty-state px-3 py-5 text-center"
-              >
-                <p className="font-mono text-[10px] tracking-[1.2px] uppercase text-muted-foreground/55">
-                  Nothing in this slice
-                </p>
-                <button
-                  onClick={() => setSelectedTopics([])}
-                  className="mt-3 font-mono text-[9px] tracking-[1.2px] uppercase text-foreground/55 transition-colors hover:text-foreground"
-                >
-                  Reset filter
-                </button>
-              </motion.div>
+              <p className="px-4 py-5 font-mono text-[10px] tracking-[1.2px] uppercase text-muted-foreground/40">
+                No favourites yet
+              </p>
             )}
           </div>
         </div>

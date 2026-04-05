@@ -23,10 +23,7 @@ const GITHUB_LINK = socialLinks.github.href;
 interface RootShellProps {
   monthsData: MonthData[];
   allEntryDates: string[];
-  recentEntries: Pick<
-    Entry,
-    "date" | "title" | "primary_color" | "icon_name" | "genre"
-  >[];
+  recentEntries: Pick<Entry, "date" | "title" | "icon_name" | "tags">[];
   children: React.ReactNode;
 }
 

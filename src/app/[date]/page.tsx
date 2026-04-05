@@ -10,20 +10,25 @@ interface DatePageProps {
 function isValidDateSlug(date: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const parsed = new Date(`${date}T12:00:00`);
-  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === date
+  );
 }
 
-export async function generateMetadata({ params }: DatePageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: DatePageProps): Promise<Metadata> {
   const { date } = await params;
   const { allEntries } = getStableSiteData();
-  const entry = allEntries.find(e => e.date === date) ?? null;
+  const entry = allEntries.find((e) => e.date === date) ?? null;
 
   if (!entry) {
     return {
       title: isValidDateSlug(date) ? `No entry for ${date}` : "No Entry Found",
       description: isValidDateSlug(date)
         ? "No entry yet for this date."
-        : "No entry found for this date."
+        : "No entry found for this date.",
     };
   }
 
@@ -32,7 +37,7 @@ export async function generateMetadata({ params }: DatePageProps): Promise<Metad
     : `Entry for ${new Date(entry.date).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
       })}`;
 
   const description = entry.content
@@ -47,7 +52,7 @@ export async function generateMetadata({ params }: DatePageProps): Promise<Metad
   return {
     title,
     description,
-    keywords: entry.keywords || undefined,
+    keywords: entry.tags || undefined,
     alternates: { canonical },
     openGraph: {
       type: "article",
@@ -55,28 +60,23 @@ export async function generateMetadata({ params }: DatePageProps): Promise<Metad
       description,
       url: canonical,
       images: [ogImage],
-      publishedTime: entry.date
+      publishedTime: entry.date,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage]
-    }
+      images: [ogImage],
+    },
   };
 }
 
 export default async function DatePage({ params }: DatePageProps) {
   const { date } = await params;
   const { allEntries, allEntryDates } = getStableSiteData();
-  const existingEntry = allEntries.find(e => e.date === date) ?? null;
-  const entry: typeof existingEntry | EmptyEntry | null = existingEntry
-    ?? (isValidDateSlug(date) ? { date, isEmpty: true } : null);
+  const existingEntry = allEntries.find((e) => e.date === date) ?? null;
+  const entry: typeof existingEntry | EmptyEntry | null =
+    existingEntry ?? (isValidDateSlug(date) ? { date, isEmpty: true } : null);
 
-  return (
-    <DatePageClient
-      entry={entry}
-      allEntryDates={allEntryDates}
-    />
-  );
+  return <DatePageClient entry={entry} allEntryDates={allEntryDates} />;
 }

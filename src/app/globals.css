@@ -586,28 +586,6 @@ body {
   background: color-mix(in srgb, var(--foreground) 1.8%, transparent);
 }
 
-.entry-hero-kicker {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 6%, transparent);
-  background: color-mix(in srgb, var(--background) 80%, transparent);
-  padding: 0.55rem 0.95rem;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: var(--foreground);
-  backdrop-filter: blur(18px) saturate(155%);
-  -webkit-backdrop-filter: blur(18px) saturate(155%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    0 14px 32px rgba(0, 0, 0, 0.06);
-}
-
 .share-dropdown {
   display: flex;
   flex-direction: column;
@@ -822,7 +800,6 @@ body {
 }
 
 
-.dark .entry-hero-kicker,
 .dark .entry-hero-panel,
 .dark .entry-media-frame,
 .dark .entry-side-note,
@@ -833,12 +810,6 @@ body {
 }
 
 @media (max-width: 767px) {
-  .entry-hero-kicker {
-    padding: 0.48rem 0.82rem;
-    font-size: 9px;
-    letter-spacing: 1.15px;
-  }
-
   .entry-hero-panel {
     padding: 0.85rem 0.9rem 0.8rem;
     border-radius: 22px;

@@ -12,7 +12,7 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
-import { getTopicColor, TOPICS } from "@/lib/topics";
+import { getTopicColor } from "@/lib/topics";
 import type { Entry, EntryMetadata } from "@/lib/types";
 import { BearSvg } from "@/components/bear-svg";
 import { socialLinks } from "@content/sidebar/profile";
@@ -140,6 +140,8 @@ export function EntryView({
 
   const entryDescription = useMemo(() => {
     if (!contentEntry) return null;
+    if (contentEntry.description?.trim())
+      return contentEntry.description.trim();
     const fromMetadata = metadata?.description?.trim();
     if (fromMetadata) return fromMetadata;
 
@@ -162,7 +164,13 @@ export function EntryView({
       }
     }
 
-    const plain = textContent
+    // Strip embed lines (@[url], @![cap](url), ![alt](url)) before extracting readable text
+    const withoutEmbeds = textContent
+      ?.split("\n")
+      .filter((line) => !/^@!?\[|^!\[/.test(line.trim()))
+      .join(" ");
+
+    const plain = withoutEmbeds
       ?.replace(/[#>*`\-\[\]()]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
@@ -235,19 +243,14 @@ export function EntryView({
   }
 
   const currentEntry = entry as Entry;
-  const overlayColor =
-    currentEntry.primary_color ||
-    getTopicColor(currentEntry.icon_name) ||
-    "#737373";
+  const overlayColor = getTopicColor(currentEntry.icon_name) || "#737373";
 
-  const topicLabel =
-    TOPICS[currentEntry.icon_name ?? "sparkle"]?.label ?? "Archive";
-  const genreList =
-    (currentEntry.genre ?? currentEntry.keywords)
+  const tagLabels =
+    currentEntry.tags
       ?.split(/[|,]/)
-      .map((g) => g.trim())
+      .map((t) => t.trim())
       .filter(Boolean)
-      .slice(0, 6) ?? [];
+      .slice(0, 12) ?? [];
   const entryDateLabel = formatEntryDate(currentEntry.date);
   const desktopWidthClass =
     !isMobile && sidebarState === "expanded"
@@ -288,11 +291,7 @@ export function EntryView({
           >
             <div className="mx-auto max-w-[920px]">
               <div className="border-b border-border/70 pb-10 text-center md:pb-12">
-                <div className="entry-hero-kicker mx-auto">
-                  <span>{topicLabel}</span>
-                </div>
-
-                <h1 className="mx-auto mt-5 max-w-[880px] text-balance font-serif text-[36px] leading-[0.92] text-foreground md:text-[72px]">
+                <h1 className="mx-auto max-w-[880px] text-balance font-serif text-[36px] leading-[0.92] text-foreground md:text-[72px]">
                   {currentEntry.title || "No Title Provided"}
                 </h1>
 
@@ -306,9 +305,9 @@ export function EntryView({
                   <div className="mt-5 flex items-center justify-center">
                     <span className="entry-keyword-pill">{entryDateLabel}</span>
                   </div>
-                  {genreList.length > 0 && (
+                  {tagLabels.length > 0 && (
                     <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-                      {genreList.map((g) => (
+                      {tagLabels.map((g) => (
                         <span key={g} className="entry-keyword-pill">
                           {g}
                         </span>
@@ -318,13 +317,15 @@ export function EntryView({
                 </div>
               </div>
 
-              <div className="mt-10 md:mt-14">
-                <MediaRenderer
-                  entry={currentEntry}
-                  metadata={metadata}
-                  isLoadingMetadata={loadingMetadata}
-                />
-              </div>
+              {currentEntry.media_url && (
+                <div className="mt-10 md:mt-14">
+                  <MediaRenderer
+                    entry={currentEntry}
+                    metadata={metadata}
+                    isLoadingMetadata={loadingMetadata}
+                  />
+                </div>
+              )}
 
               <div className="mt-12 md:mt-16 mx-auto max-w-[700px]">
                 <div

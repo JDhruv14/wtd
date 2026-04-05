@@ -7,21 +7,21 @@ export interface EntryMetadata {
   url: string;
 }
 
+/** Canonical entry shape. Theme color is always derived from `icon_name` via `TOPICS` (see `getTopicColor`). */
 export interface Entry {
   id: number;
   created_at: string;
   date: string;
   title: string;
+  /** Optional front matter subtitle shown under the title. Falls back to auto-extracted body text. */
+  description: string | null;
   content: string;
-  media_type: MediaType;
-  media_url: string;
   icon_name: string | null;
-  primary_color: string | null;
-  keywords: string | null;      // legacy: kept for old TipTap entries
-  genre: string | null;         // displayed "Filed under" tags (e.g. "music, hip-hop")
-  tags: string | null;          // invisible search/meta keywords
-  why_it_stayed: string | null; // optional personal annotation shown in sidebar
+  /** Comma- or pipe-separated labels; shown under the date on the entry page and used for topic filters. */
+  tags: string | null;
   like_count: number;
+  media_url: string;
+  media_type: MediaType;
   initialMetadata: EntryMetadata | null;
 }
 
@@ -31,8 +31,7 @@ export interface DayData {
   hasContent: boolean;
   isToday: boolean;
   iconName: string | null;
-  primaryColor: string | null;
-  genre: string | null;
+  tags: string | null;
 }
 
 export interface MonthData {
@@ -41,18 +40,9 @@ export interface MonthData {
   days: DayData[];
 }
 
-export interface EntrySummary {
-  date: string;
-  media_type: string;
-  icon_name: string;
-  primary_color: string;
-}
-
 export interface SiteData {
-  monthsData: MonthData[];
+  allEntries: Entry[];
   allEntryDates: string[];
-  latestEntryDate: string;
-  allEntries: EntrySummary[];
-  entries: Entry[];
+  monthsData: MonthData[];
+  recentEntries: Pick<Entry, "date" | "title" | "icon_name" | "tags">[];
 }
-

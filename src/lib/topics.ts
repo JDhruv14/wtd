@@ -1,102 +1,91 @@
 /**
- * Topic categories ? each maps to a unique icon + color.
- * Colors are mid-range saturation so they read clearly on both light and dark backgrounds.
+ * Single source of truth for all topics. Each entry is the canonical icon key
+ * (matching icon.tsx cases), with display info and the tag tokens that map to it.
  */
 export interface TopicConfig {
   label: string;
   color: string;
+  /** Tag / icon-name tokens (lowercase) that resolve to this topic. */
+  aliases: string[];
 }
 
 export const TOPICS: Record<string, TopicConfig> = {
-  // video / media
-  youtube:  { label: "YouTube",  color: "#FF0000" }, // YouTube Red
-  reel:     { label: "Reel",     color: "#E1306C" }, // Instagram Rose
-  movie:    { label: "Movie",    color: "#FF6B6B" }, // Vibrant Coral
-  anime:    { label: "Otaku",    color: "#FF9EED" }, // Soft Pink
-  show:     { label: "TV Show",  color: "#00E5FF" }, // Neon Cyan
-
-  // reading / writing
-  article:  { label: "Article",  color: "#FFD166" }, // Sunglow
-  blog:     { label: "Blog",     color: "#F4A261" }, // Sandy Brown
-  book:     { label: "Book",     color: "#2A9D8F" }, // Muted Teal
-  thread:   { label: "Thread",   color: "#118AB2" }, // Sapphire Blue
-  thought:  { label: "Thought",  color: "#B5A642" }, // Brass Gold
-
-  // social / web
-  tweet:    { label: "Twitter",  color: "#1DA1F2" }, // Twitter Blue
-  website:  { label: "Internet", color: "#48CAE4" }, // Sky Blue
-  link:     { label: "Link",     color: "#0077B6" }, // Ocean Blue
-
-  // audio
-  music:    { label: "Music",    color: "#1DB954" }, // Spotify Green
-  album:    { label: "Album",    color: "#E9C46A" }, // Maize
-  podcast:  { label: "Podcast",  color: "#9D4EDD" }, // Deep Purple
-
-  // creative / tech
-  design:   { label: "Design",   color: "#FF007F" }, // Vibrant Fuchsia 
-  photo:    { label: "Photo",    color: "#ACB89A" }, // Sage Green 
-  art:      { label: "Art",      color: "#FFB5A7" }, // Peach Pink
-  code:     { label: "Code",     color: "#06D6A0" }, // Syntax Mint
-  game:     { label: "Game",     color: "#7209B7" }, // Grape Purple 
-  tool:     { label: "Tool",     color: "#9A8C98" }, // Steel Lavender
-  sparkle:  { label: "Life",     color: "#FFB703" }, // Bright Star Yellow
+  sparkle: { label: "Life", color: "#FFB703", aliases: ["life", "sparkle"] },
+  youtube: { label: "YouTube", color: "#FF0000", aliases: ["youtube"] },
+  tweet: {
+    label: "Twitter",
+    color: "#1DA1F2",
+    aliases: ["twitter", "tweet", "x"],
+  },
+  code: { label: "Code", color: "#06D6A0", aliases: ["code"] },
+  website: {
+    label: "Internet",
+    color: "#48CAE4",
+    aliases: ["internet", "website"],
+  },
+  movie: { label: "Movie", color: "#FF6B6B", aliases: ["movie"] },
+  podcast: { label: "Podcast", color: "#9D4EDD", aliases: ["podcast"] },
+  book: { label: "Book", color: "#2A9D8F", aliases: ["book"] },
+  anime: { label: "Otaku", color: "#FF9EED", aliases: ["otaku", "anime"] },
 };
 
-export function getTopicColor(iconName: string | null | undefined): string | undefined {
-  if (!iconName) return undefined;
-  return TOPICS[iconName]?.color;
+/** Build a reverse-lookup token → canonical key at module load time. */
+const TOKEN_TO_KEY: Record<string, string> = {};
+for (const [key, cfg] of Object.entries(TOPICS)) {
+  for (const alias of cfg.aliases) TOKEN_TO_KEY[alias] = key;
 }
 
-export const GENRE_MAP: Record<string, { icon: string; color: string; label: string }> = {
-  life:     { icon: 'sparkle', color: '#FBBF24', label: 'Life' },
-  youtube:  { icon: 'youtube', color: '#EF4444', label: 'YouTube' },
-  twitter:  { icon: 'tweet',   color: '#3B82F6', label: 'Twitter' },
-  code:     { icon: 'code',    color: '#84CC16', label: 'Code' },
-  internet: { icon: 'website', color: '#06B6D4', label: 'Internet' },
-  movie:    { icon: 'movie',   color: '#A855F7', label: 'Movie' },
-  podcast:  { icon: 'podcast', color: '#8B5CF6', label: 'Podcast' },
-  book:     { icon: 'book',    color: '#22C55E', label: 'Book' },
-  otaku:    { icon: 'anime',   color: '#EC4899', label: 'Otaku' },
-};
+/** Normalize any icon-name or tag token to a canonical TOPICS key, or `undefined` if unknown. */
+function resolveTopicKey(raw: string | null | undefined): string | undefined {
+  if (!raw) return undefined;
+  const lower = raw.trim().toLowerCase();
+  return TOKEN_TO_KEY[lower] ?? (TOPICS[lower] ? lower : undefined);
+}
 
-export const CANONICAL_GENRES = Object.entries(GENRE_MAP).map(([genre, config]) => ({
-  genre,
-  icon: config.icon,
-  color: config.color,
-  label: config.label,
+/** Returns the canonical TOPICS key, falling back to `"sparkle"` for unknowns. */
+export function canonicalIconName(raw: string | null | undefined): string {
+  return resolveTopicKey(raw) ?? "sparkle";
+}
+
+/** Returns the accent color for a topic key or any recognized alias. */
+export function getTopicColor(
+  iconName: string | null | undefined,
+): string | undefined {
+  const key = resolveTopicKey(iconName);
+  return key ? TOPICS[key].color : undefined;
+}
+
+/** Shape used by the sidebar filter UI. */
+export const CANONICAL_GENRES = Object.entries(TOPICS).map(([icon, cfg]) => ({
+  icon,
+  label: cfg.label,
+  color: cfg.color,
 }));
 
-export function parseGenreTokens(genre: string | null | undefined): string[] {
-  if (!genre) return [];
-
-  const tokens = genre
-    .split(/[|,]/)
-    .map((token) => token.trim().toLowerCase())
-    .filter(Boolean);
-
-  const icons = tokens
-    .map((token) => GENRE_MAP[token]?.icon)
-    .filter((icon): icon is string => Boolean(icon));
-
-  return Array.from(new Set(icons));
+/** Parses comma/pipe-separated tag tokens and returns matching canonical topic keys. */
+export function parseTagsForTopics(tags: string | null | undefined): string[] {
+  if (!tags) return [];
+  const seen = new Set<string>();
+  for (const token of tags.split(/[|,]/).map((t) => t.trim().toLowerCase())) {
+    const key = TOKEN_TO_KEY[token];
+    if (key) seen.add(key);
+  }
+  return Array.from(seen);
 }
 
-export function getGenreTopicKey(genre: string | null | undefined): string | null {
-  return parseGenreTokens(genre)[0] ?? null;
-}
-
+/** Primary topic key from tags, then icon_name, then `"sparkle"`. */
 export function getTopicKeyFromEntry(
-  genre: string | null | undefined,
+  tags: string | null | undefined,
   iconName: string | null | undefined,
 ): string {
-  return getGenreTopicKey(genre) ?? iconName ?? 'sparkle';
+  return parseTagsForTopics(tags)[0] ?? canonicalIconName(iconName);
 }
 
+/** All topic keys for an entry (from tags, or icon_name if no tags match). */
 export function getTopicKeysFromEntry(
-  genre: string | null | undefined,
+  tags: string | null | undefined,
   iconName: string | null | undefined,
 ): string[] {
-  const genreIcons = parseGenreTokens(genre);
-  if (genreIcons.length > 0) return genreIcons;
-  return [iconName ?? 'sparkle'];
+  const fromTags = parseTagsForTopics(tags);
+  return fromTags.length > 0 ? fromTags : [canonicalIconName(iconName)];
 }

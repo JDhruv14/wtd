@@ -14,10 +14,7 @@ import type { DayData, Entry, MonthData } from "@/lib/types";
 interface DateLayoutClientProps {
   monthsData: MonthData[];
   allEntryDates: string[];
-  recentEntries: Pick<
-    Entry,
-    "date" | "title" | "primary_color" | "icon_name" | "genre"
-  >[];
+  recentEntries: Pick<Entry, "date" | "title" | "icon_name" | "tags">[];
   children: React.ReactNode;
 }
 

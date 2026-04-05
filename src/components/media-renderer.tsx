@@ -189,7 +189,7 @@ function LinkPreviewCard({
 
 function MediaPlaceholder({ entry }: { entry: Entry }) {
   const iconName = entry.icon_name || "sparkle";
-  const color = entry.primary_color || getTopicColor(iconName) || "#737373";
+  const color = getTopicColor(iconName) || "#737373";
 
   return (
     <div className="w-full flex flex-col overflow-hidden shadow-2xl border border-border bg-muted/60 backdrop-blur-xl rounded-[16px]">

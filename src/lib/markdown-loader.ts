@@ -1,5 +1,5 @@
 import type { Entry, DayData, MonthData } from "./types";
-import { GENRE_MAP, getTopicColor } from "./topics";
+import { canonicalIconName, parseTagsForTopics } from "./topics";
 import contentIndex from "./content-index.json";
 
 const MONTH_ABBR: Record<number, string> = {
@@ -69,51 +69,39 @@ const URL_ICON_MAP: Array<[string, string]> = [
   ["behance.net", "design"],
 ];
 
-/**
- * Infer the calendar icon from URL first, then the genre.
- * Genre is matched against GENRE_MAP (case-insensitive, first token wins).
- */
-function inferIconName(url: string, genre: string | undefined): string {
+/** Infer the calendar icon from URL first, then the first matching tag token. */
+function inferIconName(url: string, tags: string | undefined): string {
   for (const [domain, icon] of URL_ICON_MAP) {
     if (url.includes(domain)) return icon;
   }
-  if (genre) {
-    const first = genre
-      .trim()
-      .toLowerCase()
-      .split(/[,\s]+/)[0];
-    if (first && GENRE_MAP[first]) return GENRE_MAP[first].icon;
-  }
-  return "sparkle";
+  return parseTagsForTopics(tags ?? null)[0] ?? "sparkle";
 }
 
 export function loadMdEntries(): Entry[] {
   return (contentIndex as { date: string; raw: string }[]).map(
     ({ date, raw }, idx) => {
       const { meta, body } = parseFrontmatter(raw);
-      const mediaUrl = meta.url ?? meta.media_url ?? "";
+      const mediaUrl = "";
       const mediaType =
         meta["media-type"] ?? meta.media_type ?? inferMediaType(mediaUrl);
-      const iconName =
-        meta["icon-name"] ??
-        meta.icon_name ??
-        inferIconName(mediaUrl, meta.genre);
+      const tagsRaw = meta.tags ?? meta.genre ?? null;
+      const explicitIcon = meta["icon-name"] ?? meta.icon_name ?? "";
+      const iconName = explicitIcon.trim()
+        ? canonicalIconName(explicitIcon)
+        : inferIconName(mediaUrl, tagsRaw ?? undefined);
 
       return {
         id: 10000 + idx,
         created_at: `${date}T00:00:00.000Z`,
         date,
         title: meta.title ?? "",
+        description: meta.description ?? null,
         content: body,
         media_type: mediaType,
         media_url: mediaUrl,
         icon_name: iconName,
-        primary_color: getTopicColor(iconName) ?? null,
-        keywords: meta.keywords ?? null,
-        genre: meta.genre ?? null,
-        tags: meta.tags ?? null,
-        why_it_stayed: meta.why_it_stayed ?? null,
-        like_count: Number(meta.like_count ?? 0),
+        tags: tagsRaw,
+        like_count: 0,
         initialMetadata: null,
       } as Entry;
     },
@@ -162,8 +150,7 @@ export function buildMergedMonthsData(
           hasContent: !!entry,
           isToday: date === today,
           iconName: entry?.icon_name ?? null,
-          primaryColor: entry?.primary_color ?? null,
-          genre: entry?.genre ?? null,
+          tags: entry?.tags ?? null,
         };
       });
       return { month: MONTH_ABBR[m], year: String(y), days };
