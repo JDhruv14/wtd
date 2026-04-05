@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/og-image.png",
+        url: "/gh_image.png",
         width: 1200,
         height: 630,
         alt: "What the Dhruv",
@@ -94,7 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "What the Dhruv!?",
     description: siteDescription,
-    images: ["/og-image.png"],
+    images: ["/gh_image.png"],
   },
   icons: {
     icon: [
