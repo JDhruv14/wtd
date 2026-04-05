@@ -104,6 +104,13 @@ function SidebarProvider({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [toggleSidebar]);
 
+  /** Resize / MacBook: leave mobile sheet closed when viewport is desktop so fixed sidebar + md:* layout stay in sync. */
+  React.useLayoutEffect(() => {
+    if (!isMobile) {
+      setOpenMobile(false);
+    }
+  }, [isMobile]);
+
   const state = open ? "expanded" : "collapsed";
 
   const contextValue = React.useMemo<SidebarContextProps>(

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   SidebarProvider,
@@ -9,6 +9,7 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { DayData, Entry, MonthData } from "@/lib/types";
 
 interface DateLayoutClientProps {
@@ -26,15 +27,8 @@ export function DateLayoutClient({
 }: DateLayoutClientProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [mobile, setMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [activeView, setActiveView] = useState<"day" | "about">("day");
-
-  useEffect(() => {
-    const onResize = () => setMobile(window.innerWidth < 768);
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   const selectedDate = useMemo(() => {
     const seg = pathname.split("/").filter(Boolean).at(-1) ?? "";
@@ -48,7 +42,7 @@ export function DateLayoutClient({
   return (
     <>
       <SidebarProvider
-        defaultOpen={!mobile}
+        defaultOpen={!isMobile}
         style={
           {
             "--sidebar-width": "320px",
@@ -84,7 +78,7 @@ export function DateLayoutClient({
             <div className="h-14 shrink-0 md:hidden" aria-hidden="true" />
 
             <main
-              className={`flex-1 ${mobile ? "overflow-y-auto" : "overflow-hidden"}`}
+              className={`flex-1 ${isMobile ? "overflow-y-auto" : "overflow-hidden"}`}
             >
               {children}
             </main>

@@ -312,9 +312,7 @@ body {
     html:not(.dark) .dropdown-panel.glass-dock,
     .dark .dropdown-panel.glass-dock,
     [data-mobile="true"][data-sidebar="sidebar"],
-    .dark [data-mobile="true"][data-sidebar="sidebar"],
-    [data-slot="sidebar-inner"],
-    .dark [data-slot="sidebar-inner"] {
+    .dark [data-mobile="true"][data-sidebar="sidebar"] {
       backdrop-filter: blur(18px) saturate(145%) !important;
       -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
     }
@@ -325,8 +323,7 @@ body {
     .frosted-surface,
     .glass-header,
     html:not(.dark) .dropdown-panel.glass-dock,
-    [data-mobile="true"][data-sidebar="sidebar"],
-    [data-slot="sidebar-inner"] {
+    [data-mobile="true"][data-sidebar="sidebar"] {
       background: rgba(250, 250, 248, 0.68) !important;
       background-color: rgba(250, 250, 248, 0.68) !important;
     }
@@ -337,29 +334,29 @@ body {
     .dark .frosted-surface,
     .dark .glass-header,
     .dark .dropdown-panel.glass-dock,
-    .dark [data-mobile="true"][data-sidebar="sidebar"],
-    .dark [data-slot="sidebar-inner"] {
+    .dark [data-mobile="true"][data-sidebar="sidebar"] {
       background: rgba(18, 18, 16, 0.7) !important;
       background-color: rgba(18, 18, 16, 0.7) !important;
     }
 
+    /* Only the mobile sheet — not desktop [data-slot="sidebar-inner"], or WebKit can mask/clip header controls (iPad / Safari). */
     [data-mobile="true"][data-sidebar="sidebar"],
-    .dark [data-mobile="true"][data-sidebar="sidebar"],
-    [data-slot="sidebar-inner"],
-    .dark [data-slot="sidebar-inner"] {
+    .dark [data-mobile="true"][data-sidebar="sidebar"] {
       clip-path: none !important;
       filter: none !important;
     }
 
-    [data-slot="sidebar-container"],
-    .dark [data-slot="sidebar-container"],
     [data-mobile="true"][data-sidebar="sidebar"],
-    .dark [data-mobile="true"][data-sidebar="sidebar"],
-    [data-slot="sidebar-inner"],
-    .dark [data-slot="sidebar-inner"] {
+    .dark [data-mobile="true"][data-sidebar="sidebar"] {
       border-radius: 0 22px 22px 0 !important;
       overflow: hidden;
       -webkit-mask-image: -webkit-radial-gradient(white, black);
+    }
+
+    [data-slot="sidebar-container"],
+    .dark [data-slot="sidebar-container"] {
+      border-radius: 0 22px 22px 0 !important;
+      overflow: hidden;
     }
 
     .group[data-state="expanded"] [data-slot="sidebar-container"],

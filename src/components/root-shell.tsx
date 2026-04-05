@@ -15,6 +15,7 @@ import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
 import { ABOUT_PANEL_HASH, SIDEBAR_VIEW_STORAGE_KEY } from "@/lib/sidebar-view";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { DayData, Entry, MonthData } from "@/lib/types";
 import { socialLinks } from "@content/sidebar/profile";
 
@@ -98,7 +99,7 @@ export function RootShell({
 }: RootShellProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [mobile, setMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [activeView, setActiveView] = useState<"day" | "about">(() => {
     if (typeof window === "undefined") return "day";
     try {
@@ -154,13 +155,6 @@ export function RootShell({
     }
   }, [activeView, pathname]);
 
-  useEffect(() => {
-    const onResize = () => setMobile(window.innerWidth < 768);
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
   const selectedDate = useMemo(() => {
     const seg = pathname.split("/").filter(Boolean).at(-1) ?? "";
     return /^\d{4}-\d{2}-\d{2}$/.test(seg) ? seg : null;
@@ -191,7 +185,7 @@ export function RootShell({
   return (
     <>
       <SidebarProvider
-        defaultOpen={!mobile}
+        defaultOpen={!isMobile}
         style={
           {
             "--sidebar-width": "320px",
