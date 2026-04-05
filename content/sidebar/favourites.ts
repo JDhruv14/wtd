@@ -3,4 +3,4 @@ export const favouritesSection = {
   label: "My favourites",
 } as const;
 
-export const favourites: string[] = ["2026-04-03"];
+export const favourites: string[] = ["2026-04-03", "2026-04-04"];

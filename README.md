@@ -1,44 +1,71 @@
 # What the Dhruv
 
-A personal, date-based archive site: daily Markdown entries, a calendar sidebar, topic filters, and live likes (Redis). The UI is built as a calm, editorial reading experience.
+<p align="center">
+  <strong>A Space where thoughts find their way home</strong><br />
+  <em>One Markdown file per day — calendar, topics, and likes that remember you.</em>
+</p>
 
-## Stack
 
-- **Next.js** (App Router) + **React** + **TypeScript**
-- **Tailwind CSS**
-- Content: Markdown under `content/` with YAML front matter
-- **OpenNext + Cloudflare** for deploy (`wrangler`, `@opennextjs/cloudflare`)
-- **Upstash Redis** for `/api/like` counts (optional locally; set env in production)
+<p align="center">
+  <a href="https://github.com/JDhruv14/wtd"><strong>Repository</strong></a>
+  &nbsp;·&nbsp;
+  <a href="content/WRITING.md"><strong>Writing guide</strong></a>
+</p>
+
+<p align="center">
+  <img src="./public/gh_image.png" alt="What the Dhruv preview" width="720" />
+</p>
+
+## Why this exists
+
+**What the Dhruv** is built around a simple idea: In all the hustle and fast paced life, we tend to forget all the small details, learnings and observations. This website is dedicated to you, I want you to talk to yourself, confront youself and spend some 5 minutes with your self.
+
+**Built with:** Next.js 16 · TypeScript · React · Cloudflare · Redis
+
+## Setup
+
+```bash
+git clone https://github.com/JDhruv14/wtd.git
+cd wtd
+npm install
+```
+
+`.env`:
+
+```env
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+```
+
+```bash
+npm run dev
+```
+
+## Writing posts
+
+**[content/WRITING.md](content/WRITING.md)** — front matter, Markdown, embeds, `icon-name`, tags.
 
 ## Scripts
 
 | Command | Purpose |
 |--------|---------|
-| `npm run dev` | Regenerates the content index, then starts Next dev server |
-| `npm run build` | Content index + OpenNext Cloudflare production build |
-| `npm run preview` | Preview the Cloudflare build |
-| `npm run deploy` | Deploy via OpenNext Cloudflare |
-| `npm run lint` | ESLint |
+| `npm run dev` | Content index + Next dev |
+| `npm run build` | Content index + OpenNext (Cloudflare) build |
+| `npm run preview` | Preview Cloudflare build |
 
-## Environment
 
-Create `.env` (not committed) with:
+## Support
 
-- `UPSTASH_REDIS_REST_URL` — REST URL from Upstash
-- `UPSTASH_REDIS_REST_TOKEN` — REST token
+[![GitHub Sponsors](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=github-sponsors&logoColor=%23EA4AAA)](https://github.com/sponsors/JDhruv14)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jdhruv14)
 
-If these are missing, like counts still work in the UI but persist as zeros server-side.
+## Creator
 
-## Writing posts
+**[@dhruvtwt_](https://x.com/dhruvtwt_)**
 
-See **`content/WRITING.md`** for file layout, front matter, Markdown syntax, embeds (`@[url]`), **`icon-name`**, **`tags`**, and topics.
+---
 
-## Content layout
+<p align="center">
+    <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true" alt="Catppuccin" width="100%" />
+</p>
 
-- Entries: `content/YYYY/MM/YYYY-MM-DD.md`
-- Favourites list: `content/sidebar/favourites.ts`
-- Build writes `src/lib/content-index.json` (generated; do not hand-edit)
-
-## License
-
-Private project unless you add a license.

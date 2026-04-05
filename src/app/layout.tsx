@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/lib/site-url";
 import {
   Cormorant_Garamond,
   DM_Mono,
@@ -40,10 +41,53 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-export const metadata = {
-  title: "What the Dhruv!?",
-  description:
-    "A personal daily log of the best thing seen each day, built in Next.js with componentized animations.",
+const siteDescription =
+  "A personal daily archive — links, notes, and what stayed with me. A small way to stay in touch with your own attention.";
+
+export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
+  title: {
+    default: "What the Dhruv!?",
+    template: "%s · What the Dhruv",
+  },
+  description: siteDescription,
+  applicationName: "What the Dhruv",
+  keywords: ["blog", "archive", "journal", "daily log", "Dhruv Jaradi"],
+  authors: [{ name: "Dhruv Jaradi" }],
+  creator: "Dhruv Jaradi",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "What the Dhruv",
+    title: "What the Dhruv!?",
+    description: siteDescription,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "What the Dhruv",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "What the Dhruv!?",
+    description: siteDescription,
+    images: ["/og-image.png"],
+  },
   icons: {
     icon: [
       {
@@ -86,6 +130,11 @@ export default function RootLayout({
             __html: `(function(){var k='btw-theme';var v=localStorage.getItem(k);var d=document.documentElement;if(v==='light')d.classList.remove('dark');else if(v==='dark')d.classList.add('dark');else if(window.matchMedia('(prefers-color-scheme:dark)').matches)d.classList.add('dark');else d.classList.remove('dark');})();`,
           }}
         />
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="c048cbee-76c0-48d1-8090-ccab3e1259fc"
+        ></script>
       </head>
       <body className="antialiased bg-background text-foreground">
         {/* SVG filter for liquid glass displacement — referenced by backdrop-filter: url(#liquid-glass) */}

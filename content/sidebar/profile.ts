@@ -12,7 +12,7 @@ export const socialLinks = {
     ariaLabel: "Open X profile",
   },
   github: {
-    href: "https://github.com/JDhruv14/what-the-dhruv",
+    href: "https://github.com/JDhruv14/wtd",
     label: "GitHub",
     ariaLabel: "Open GitHub profile — star the repo!",
   },

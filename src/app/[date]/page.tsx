@@ -48,6 +48,7 @@ export async function generateMetadata({
 
   const ogImage = "/og-image.png";
   const canonical = `/${entry.date}`;
+  const publishedTime = `${entry.date}T12:00:00.000Z`;
 
   return {
     title,
@@ -59,8 +60,16 @@ export async function generateMetadata({
       title,
       description,
       url: canonical,
-      images: [ogImage],
-      publishedTime: entry.date,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      publishedTime,
+      modifiedTime: publishedTime,
     },
     twitter: {
       card: "summary_large_image",
