@@ -272,13 +272,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
                     ref={shareMenuRef}
                     className="glass-dock dropdown-panel fixed z-[90] w-[140px] rounded-[16px] px-1.5 pt-1.5 pb-1"
                   >
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
-                      className="share-dropdown"
-                    >
+                    <div className="share-dropdown">
                       <button
                         type="button"
                         onClick={(event) => void copyPageUrl(event)}
@@ -315,7 +309,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
                             <span>More options</span>
                           </button>
                         )}
-                    </motion.div>
+                    </div>
                   </div>
                 )}
               </AnimatePresence>,
