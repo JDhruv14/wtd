@@ -61,7 +61,6 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
   const [apiCount, setApiCount] = useState<number | null>(null);
   const [apiTaps, setApiTaps] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
-  const [shareMenuPos, setShareMenuPos] = useState({ right: 0, bottom: 0 });
   const { state: sidebarState, isMobile, openMobile } = useSidebar();
   const { trigger } = useWebHaptics();
   const { ripples, addRipple } = useGlassRipple();
@@ -193,13 +192,14 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
     if (!shareOpen) return;
     const updatePos = () => {
       const btn = shareTriggerRef.current;
-      if (!btn) return;
+      const menu = shareMenuRef.current;
+      if (!btn || !menu) return;
       const rect = btn.getBoundingClientRect();
       // Anchor menu bottom edge just above the trigger (stable when rows mount later).
-      setShareMenuPos({
-        right: window.innerWidth - rect.right,
-        bottom: window.innerHeight - rect.top + 8,
-      });
+      // Apply via DOM — avoid setState here: the RAF loop + ResizeObserver would
+      // re-render the whole dock every frame and jitter the Share label / motion nodes.
+      menu.style.right = `${window.innerWidth - rect.right + 5}px`;
+      menu.style.bottom = `${window.innerHeight - rect.top + 8}px`;
     };
     updatePos();
 
@@ -234,7 +234,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
       window.removeEventListener("resize", updatePos);
       window.removeEventListener("scroll", updatePos, true);
     };
-  }, [shareOpen, sidebarState, isMobile, openMobile, shareFeedback]);
+  }, [shareOpen, sidebarState, isMobile, openMobile]);
 
   if (!entry) return null;
 
@@ -274,7 +274,14 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
         <ChevronLeft size={16} strokeWidth={2} />
       </button>
 
-      <div className="glass-dock flex items-center p-0.5 gap-0 rounded-[16px] transition-all duration-200 hover:scale-[1.004] active:scale-[0.99]">
+      <div
+        className={cn(
+          "glass-dock flex items-center p-0.5 gap-0 rounded-[16px] transition-all duration-200",
+          // Share menu is portaled to body; moving the pointer to it drops :hover here and
+          // the dock would scale back to 1 — lock hover scale while the menu is open.
+          shareOpen && "",
+        )}
+      >
         {/* Like */}
         <LikeButton
           date={entry.date}
@@ -304,40 +311,18 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
           >
             <GlassRipples ripples={ripples} />
             <div className="relative size-5 flex items-center justify-center shrink-0">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={
-                    shareFeedback === "copied" ? "share-check" : "share-icon"
-                  }
-                  initial={{ scale: 0, rotate: 24, opacity: 0 }}
-                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                  exit={{ scale: 0, rotate: -24, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 520, damping: 20 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  {shareFeedback === "copied" ? (
-                    <Icon name="check" size="base" />
-                  ) : (
-                    <Share2 size={15} className="text-foreground/65" />
-                  )}
-                </motion.span>
-              </AnimatePresence>
+              <span className="absolute inset-0 flex items-center justify-center">
+                {shareFeedback === "copied" ? (
+                  <Icon name="check" size="base" />
+                ) : (
+                  <Share2 size={15} className="text-foreground/65" />
+                )}
+              </span>
             </div>
             <span className="font-mono text-[12px] text-foreground/80 min-w-[2.4rem]">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={
-                    shareFeedback === "copied" ? "shared-label" : "share-label"
-                  }
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.15 }}
-                  className="block"
-                >
-                  {shareFeedback === "copied" ? "Copied" : "Share"}
-                </motion.span>
-              </AnimatePresence>
+              <span className="block">
+                {shareFeedback === "copied" ? "Copied" : "Share"}
+              </span>
             </span>
           </button>
 
@@ -348,17 +333,13 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
                 {shareOpen && (
                   <div
                     ref={shareMenuRef}
-                    className="glass-dock dropdown-panel fixed z-[90] w-[140px] rounded-[16px] p-1.5"
-                    style={{
-                      right: shareMenuPos.right + 5,
-                      bottom: shareMenuPos.bottom,
-                    }}
+                    className="glass-dock dropdown-panel fixed z-[90] w-[140px] rounded-[16px] px-1.5 pt-1.5 pb-1"
                   >
                     <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                      transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
                       className="share-dropdown"
                     >
                       <button
@@ -377,7 +358,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
                         onClick={() => setShareOpen(false)}
                       >
                         <Icon name="brand-x" size="sm" />
-                        <span>Post to X</span>
+                        <span>Post on X</span>
                       </a>
                       {typeof navigator !== "undefined" &&
                         "share" in navigator && (

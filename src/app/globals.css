@@ -612,9 +612,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.18rem;
-  padding: 0.08rem;
-  /* Reserve height for optional native share row so the panel doesn’t jump when it mounts */
-  min-height: 7.25rem;
+  padding: 0.08rem 0.08rem 0;
 }
 
 .share-dropdown-row {
