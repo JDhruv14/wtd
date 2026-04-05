@@ -77,7 +77,7 @@ export function LikeButton({
   }, [date]);
 
   const handleTap = () => {
-    if (completed) return;
+    if (completed || fillLevel >= FILL_MAX) return;
     const nextFill = fillLevel + 1;
     const newCount = likeCount + 1;
     setLikeCount(newCount);

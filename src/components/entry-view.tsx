@@ -140,44 +140,8 @@ export function EntryView({
 
   const entryDescription = useMemo(() => {
     if (!contentEntry) return null;
-    if (contentEntry.description?.trim())
-      return contentEntry.description.trim();
-    const fromMetadata = metadata?.description?.trim();
-    if (fromMetadata) return fromMetadata;
-
-    let textContent = contentEntry.content;
-
-    if (textContent?.startsWith('{"type":"doc"')) {
-      try {
-        const json = JSON.parse(textContent) as Record<string, unknown>;
-        const extractText = (node: Record<string, unknown>): string => {
-          if (node.type === "text") return String(node.text ?? "");
-          if (Array.isArray(node.content))
-            return node.content
-              .map((c) => extractText(c as Record<string, unknown>))
-              .join(" ");
-          return "";
-        };
-        textContent = extractText(json);
-      } catch {
-        textContent = "";
-      }
-    }
-
-    // Strip embed lines (@[url], @![cap](url), ![alt](url)) before extracting readable text
-    const withoutEmbeds = textContent
-      ?.split("\n")
-      .filter((line) => !/^@!?\[|^!\[/.test(line.trim()))
-      .join(" ");
-
-    const plain = withoutEmbeds
-      ?.replace(/[#>*`\-\[\]()]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-
-    if (!plain) return null;
-    return plain.slice(0, 170);
-  }, [contentEntry, metadata?.description]);
+    return contentEntry.description?.trim() || null;
+  }, [contentEntry]);
 
   if (isLoading) {
     return (
@@ -332,12 +296,7 @@ export function EntryView({
                   className="font-sans leading-[1.82] text-foreground/94"
                   style={{ fontSize: "var(--reading-font-size, 16px)" }}
                 >
-                  <ContentParser
-                    content={
-                      currentEntry.content ||
-                      "No description available for this day."
-                    }
-                  />
+                  <ContentParser content={currentEntry.content || ""} />
                 </div>
               </div>
             </div>

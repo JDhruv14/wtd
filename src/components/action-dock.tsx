@@ -40,7 +40,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
       setApiCount(null);
       setApiTaps(0);
     });
-    fetch(`/api/like?date=${entry.date}`)
+    fetch(`/api/like?date=${entry.date}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         setApiCount(d.count ?? 0);
@@ -78,6 +78,7 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
     if (!entry?.date || typeof window === "undefined") return;
     fetch("/api/like", {
       method: "POST",
+      cache: "no-store",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date: entry.date }),
     })
