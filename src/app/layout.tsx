@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { getOgImagePath } from "@/lib/og-image";
 import { getSiteUrl } from "@/lib/site-url";
 import {
   Cormorant_Garamond,
@@ -45,8 +44,6 @@ const instrumentSerif = Instrument_Serif({
 const siteDescription =
   "A personal space where thoughts find their way home and a spend some alone time with your own self";
 
-const ogImagePath = getOgImagePath();
-
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
   title: {
@@ -78,7 +75,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: ogImagePath,
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "What the Dhruv",
@@ -89,7 +86,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "What the Dhruv!?",
     description: siteDescription,
-    images: [ogImagePath],
+    images: ["/og-image.png"],
   },
   icons: {
     icon: [

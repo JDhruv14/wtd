@@ -2,13 +2,10 @@
 
 <p align="center">
   <strong>A Space where thoughts find their way home</strong><br />
-  <em>One Markdown file per day — calendar, topics, and likes that remember you.</em>
+  <em>One Markdown file per day, to remember things which you may eventually forget</em>
 </p>
 
-
 <p align="center">
-  <a href="https://github.com/JDhruv14/wtd"><strong>Repository</strong></a>
-  &nbsp;·&nbsp;
   <a href="content/WRITING.md"><strong>Writing guide</strong></a>
 </p>
 
@@ -33,12 +30,10 @@ npm install
 `.env`:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
-
-`NEXT_PUBLIC_SITE_URL` should be your live origin (no trailing slash). Without it, Open Graph tags can point at `localhost` and previews break. Social image defaults to **`public/gh_image.png`**; override with `NEXT_PUBLIC_OG_IMAGE=/other.png` if needed.
 
 ```bash
 npm run dev
@@ -50,25 +45,19 @@ npm run dev
 
 ## Scripts
 
-| Command | Purpose |
-|--------|---------|
-| `npm run dev` | Content index + Next dev |
-| `npm run build` | Content index + OpenNext (Cloudflare) build |
-| `npm run preview` | Preview Cloudflare build |
-
+| Command           | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| `npm run dev`     | Content index + Next dev                    |
+| `npm run build`   | Content index + OpenNext (Cloudflare) build |
+| `npm run preview` | Preview Cloudflare build                    |
 
 ## Support
 
 [![GitHub Sponsors](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=github-sponsors&logoColor=%23EA4AAA)](https://github.com/sponsors/JDhruv14)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jdhruv14)
 
-## Creator
-
-**[@dhruvtwt_](https://x.com/dhruvtwt_)**
-
 ---
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/footers/gray0_ctp_on_line.svg?sanitize=true" alt="Catppuccin" width="100%" />
 </p>
-
