@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { getSiteUrl } from "@/lib/site-url";
 import {
   Cormorant_Garamond,
   DM_Mono,
@@ -44,8 +43,17 @@ const instrumentSerif = Instrument_Serif({
 const siteDescription =
   "A personal space where thoughts find their way home and a spend some alone time with your own self";
 
+/** Open Graph absolute URLs; set `NEXT_PUBLIC_SITE_URL` at build time (e.g. in Cloudflare). */
+const metadataBase = (() => {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (raw && /^https?:\/\//i.test(raw)) {
+    return new URL(raw.replace(/\/$/, ""));
+  }
+  return new URL("http://localhost:3000");
+})();
+
 export const metadata: Metadata = {
-  metadataBase: getSiteUrl(),
+  metadataBase,
   title: {
     default: "What the Dhruv!?",
     template: "%s · What the Dhruv",
@@ -113,9 +121,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // getStableSiteData() returns the same object reference for the server process lifetime.
-  // This means RootShell (client component) receives identical props on every navigation,
-  // so React never re-renders it — the sidebar and its footer stay perfectly stable.
   const { allEntryDates, monthsData, recentEntries } = getStableSiteData();
 
   return (
@@ -137,7 +142,6 @@ export default function RootLayout({
         ></script>
       </head>
       <body className="antialiased bg-background text-foreground">
-        {/* SVG filter for liquid glass displacement — referenced by backdrop-filter: url(#liquid-glass) */}
         <svg
           aria-hidden="true"
           style={{ display: "none", position: "absolute", width: 0, height: 0 }}
