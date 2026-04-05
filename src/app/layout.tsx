@@ -42,7 +42,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 const siteDescription =
-  "A personal daily archive — links, notes, and what stayed with me. A small way to stay in touch with your own attention.";
+  "A personal space where thoughts find their way home and a spend some alone time with your own self";
 
 export const metadata: Metadata = {
   metadataBase: getSiteUrl(),
