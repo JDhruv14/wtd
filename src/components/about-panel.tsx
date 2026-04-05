@@ -10,24 +10,27 @@ interface AboutPanelProps {
 }
 
 export function AboutPanel({ isVisible }: AboutPanelProps) {
-  if (!isVisible) {
-    return null;
-  }
-
   return (
     <div
       data-nosnippet
+      className={`notranslate flex w-full flex-1 flex-col gap-4 px-4 py-4 transition-opacity duration-300 ${
+        isVisible ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
       onClick={(event) => event.stopPropagation()}
-      className="flex-1 w-full flex flex-col gap-4 px-4 py-4"
+      translate="no"
     >
       <div className="w-full flex flex-col gap-4">
         {aboutParagraphs.map((paragraph, index) => (
           <p
             key={index}
-            className="font-sans text-[16px] leading-[1.6] text-foreground motion-safe:animate-fadeInUp motion-reduce:!opacity-100"
+            className={`font-sans text-[16px] leading-[1.6] text-foreground motion-reduce:!opacity-100 ${
+              isVisible ? "motion-safe:animate-fadeInUp" : ""
+            }`}
             style={{
-              opacity: 0,
-              animationDelay: `${REVEAL_DELAY + 60 + index * STAGGER}ms`,
+              opacity: isVisible ? 0 : 1,
+              animationDelay: isVisible
+                ? `${REVEAL_DELAY + 60 + index * STAGGER}ms`
+                : undefined,
               letterSpacing: "0.01em",
             }}
           >

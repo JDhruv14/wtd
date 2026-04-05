@@ -1,4 +1,4 @@
-/** Persists across reload (language change). Must match RootShell + page-language. */
+/** Persists sidebar view across reloads. Must match RootShell. */
 export const SIDEBAR_VIEW_STORAGE_KEY = "btw-sidebar-active-view";
 
 export const ABOUT_PANEL_HASH = "#about";

@@ -651,30 +651,6 @@ body {
   background: rgba(0, 0, 0, 0.16);
 }
 
-.page-translate-root {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.goog-te-banner-frame.skiptranslate,
-iframe.goog-te-banner-frame,
-.goog-te-balloon-frame,
-.goog-te-spinner-pos,
-.goog-tooltip,
-.goog-tooltip:hover {
-  display: none !important;
-}
-
-body {
-  top: 0 !important;
-}
-
 .reading-progress-shell {
   display: flex;
   align-items: center;

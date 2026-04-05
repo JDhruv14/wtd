@@ -13,7 +13,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteLogo } from "@/components/site-logo";
 import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
-import { PageTranslator } from "@/components/ui/page-language";
 import { ABOUT_PANEL_HASH, SIDEBAR_VIEW_STORAGE_KEY } from "@/lib/sidebar-view";
 import { cn } from "@/lib/utils";
 import type { DayData, Entry, MonthData } from "@/lib/types";
@@ -203,7 +202,6 @@ export function RootShell({
           } as React.CSSProperties
         }
       >
-        <PageTranslator />
         <AppSidebar
           monthsData={monthsData}
           selectedDate={selectedDate}

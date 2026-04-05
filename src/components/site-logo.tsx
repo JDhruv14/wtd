@@ -30,7 +30,7 @@ export function SiteLogo({ size = "lg", className = "" }: SiteLogoProps) {
 
   return (
     <div
-      className={`inline-flex w-fit max-w-full items-center transition-opacity duration-300 hover:opacity-80 ${isSmall ? "flex-row gap-2" : "flex-col gap-1.5 pl-4"} ${className}`}
+      className={`inline-flex w-fit max-w-full items-center transition-opacity duration-300 hover:opacity-80 ${isSmall ? "flex-row gap-1.5" : "flex-col gap-1.5 pl-4"} ${className}`}
     >
       <div className="flex shrink-0 items-center justify-center">
         <LogoMark size={iconSize} />
@@ -43,7 +43,7 @@ export function SiteLogo({ size = "lg", className = "" }: SiteLogoProps) {
           letterSpacing: "-0.01em",
           lineHeight: isSmall ? 1 : 0.94,
         }}
-        className={`${testSignifier.className} whitespace-nowrap pl-1.5 text-foreground/92 ${isSmall ? "text-left" : "text-center"}`}
+        className={`${testSignifier.className} whitespace-nowrap text-foreground/92 ${isSmall ? "pl-0.5 text-left" : "pl-1.5 text-center"}`}
         aria-label="What the Dhruv!?"
       >
         What the Dhruv!?

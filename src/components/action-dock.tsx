@@ -244,21 +244,16 @@ export function ActionDock({ entry, allEntryDates = [] }: ActionDockProps) {
       : `https://btw.invalid/${entry.date}`;
   const shareText = `${entry.title || "Worth keeping"} via btw`;
 
-  const dockLeft = isMobile
-    ? "50%"
-    : sidebarState === "expanded"
-      ? "calc((100vw + var(--sidebar-width)) / 2)"
-      : "50vw";
-
   return (
     <div
       className={cn(
-        "fixed bottom-8 z-[75] flex -translate-x-1/2 items-center gap-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+        "fixed bottom-8 left-1/2 z-[75] flex max-w-[calc(100vw-1rem)] -translate-x-1/2 items-center gap-2 transition-[opacity,transform,margin] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] md:max-w-none",
+        sidebarState === "expanded" &&
+          "md:[margin-left:calc(var(--sidebar-width)/2)]",
         isMobile &&
           openMobile &&
           "pointer-events-none -translate-y-2 opacity-0",
       )}
-      style={{ left: dockLeft }}
     >
       {/* Prev (older) */}
       <button

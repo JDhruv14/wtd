@@ -25,7 +25,6 @@ import { CalendarMonth } from "@/components/calendar-month";
 import { Icon } from "@/components/icon";
 import { SiteLogo } from "@/components/site-logo";
 import { GlassRipples, useGlassRipple } from "@/components/ui/glass-ripple";
-import { LanguageToggle } from "@/components/ui/page-language";
 import type { DayData, Entry, MonthData } from "@/lib/types";
 import {
   CANONICAL_GENRES,
@@ -325,7 +324,8 @@ export function AppSidebar({
       side="left"
       variant="sidebar"
       collapsible="offcanvas"
-      className="w-[320px] md:w-[320px] rounded-none"
+      className="notranslate w-[320px] rounded-none md:w-[320px]"
+      translate="no"
     >
       <SidebarHeader className="rounded-none border-b border-white/10 px-4 pb-4 pt-6 dark:border-white/[0.07]">
         <div className="flex flex-col gap-4">
@@ -338,8 +338,7 @@ export function AppSidebar({
             </div>
 
             {(isMobile || state === "expanded") && (
-              <div className="flex items-center gap-2 pt-0.5">
-                <LanguageToggle compact={isMobile} />
+              <div className="flex items-center pt-0.5">
                 <SidebarTrigger
                   className="glass-btn size-8 rounded-lg"
                   aria-label="Close sidebar"

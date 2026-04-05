@@ -173,13 +173,9 @@ export function EntryView({
 
   if (isLoading) {
     return (
-      <div
-        className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full"}`}
-      >
+      <div className="flex flex-1 min-h-full flex-col bg-background md:h-full md:min-h-0">
         <DesktopRailSlot />
-        <div
-          className={`w-full max-w-[980px] self-center px-6 md:px-10 pb-32 ${isMobile ? "pt-6" : "pt-24"}`}
-        >
+        <div className="w-full max-w-[980px] self-center px-6 pb-32 pt-6 md:px-10 md:pt-24">
           <div className="mx-auto max-w-[760px]">
             <div className="h-3 w-24 rounded-full bg-muted animate-pulse" />
             <div className="mt-4 h-16 w-4/5 rounded-[20px] bg-muted animate-pulse" />
@@ -210,9 +206,7 @@ export function EntryView({
 
   if ("isEmpty" in entry && entry.isEmpty) {
     return (
-      <div
-        className={`flex-1 bg-background flex flex-col ${!isMobile ? "h-full" : "min-h-full py-12"}`}
-      >
+      <div className="flex flex-1 min-h-full flex-col bg-background py-12 md:h-full md:min-h-0 md:py-0">
         <DesktopRailSlot />
         <div className="flex-1 flex items-center justify-center">
           <div
@@ -261,9 +255,7 @@ export function EntryView({
       : "md:max-w-[920px]";
 
   return (
-    <div
-      className={`flex-1 bg-background relative ${!isMobile ? "h-full overflow-hidden" : "min-h-full"}`}
-    >
+    <div className="relative flex-1 min-h-full bg-background md:h-full md:min-h-0 md:overflow-hidden">
       <div
         style={{
           background: `radial-gradient(circle at 18% 0%, ${overlayColor}18 0%, transparent 42%), radial-gradient(circle at 85% 8%, ${overlayColor}10 0%, transparent 28%)`,
@@ -289,10 +281,10 @@ export function EntryView({
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           ref={articleScrollRef}
           id="entry-scroll-region"
-          className={`w-full ${!isMobile ? "h-full overflow-y-auto" : ""} relative z-10 flex flex-col items-center`}
+          className="relative z-10 flex w-full flex-col items-center md:h-full md:overflow-y-auto"
         >
           <div
-            className={`w-full max-w-[980px] pb-36 px-6 md:px-10 md:transition-[max-width] md:duration-300 ${desktopWidthClass} ${isMobile ? "pt-16" : "pt-24"}`}
+            className={`w-full max-w-[980px] px-6 pb-36 pt-16 md:px-10 md:pt-24 md:transition-[max-width] md:duration-300 ${desktopWidthClass}`}
           >
             <div className="mx-auto max-w-[920px]">
               <div className="border-b border-border/70 pb-10 text-center md:pb-12">
@@ -300,11 +292,7 @@ export function EntryView({
                   <span>{topicLabel}</span>
                 </div>
 
-                <h1
-                  className={`mx-auto mt-5 max-w-[880px] text-balance font-serif leading-[0.92] text-foreground ${
-                    isMobile ? "text-[36px]" : "text-[72px]"
-                  }`}
-                >
+                <h1 className="mx-auto mt-5 max-w-[880px] text-balance font-serif text-[36px] leading-[0.92] text-foreground md:text-[72px]">
                   {currentEntry.title || "No Title Provided"}
                 </h1>
 
